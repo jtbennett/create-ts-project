@@ -1,0 +1,37 @@
+{
+  "name": "@jtbennett/ts-project",
+  "author": "John Bennett",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "purge:all": " rimraf ./node_modules && rimraf ./packages/**/node_modules || rimraf ./packages/**/lib || rimraf ./packages/**/coverage",
+    "lint:all": "yarn workspaces foreach run lint",
+    "test:all": "yarn workspaces foreach run test",
+    "clean:all": "yarn workspaces foreach run clean",
+    "build:all": "yarn workspaces foreach run build",
+    "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.18",
+    "@types/node": "^12.7.8",
+    "@typescript-eslint/eslint-plugin": "^2.31.0",
+    "@typescript-eslint/parser": "^2.31.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-jest": "^23.9.0",
+    "eslint-plugin-node": "^11.1.0",
+    "jest": "24.9.0",
+    "prettier": "2.0.5",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^24.0.2",
+    "typescript": "~3.8.3"
+  },
+  "prettier": {
+    "trailingComma": "all"
+  }
+}
