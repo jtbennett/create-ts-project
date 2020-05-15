@@ -1,0 +1,32 @@
+{
+  "name": "node-lib",
+  "description": "",
+  "version": "1.0.0",
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "dev": "tsc --build --watch --preserveWatchOutput",
+    "lint": "eslint ./src --ext .ts --env node",
+    "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
+    "clean": "rimraf ./lib",
+    "build": "tsc --build",
+    "verify": "yarn lint --max-warnings 0 && yarn test && yarn clean && yarn build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^14.0.1",
+    "eslint": "^6.8.0",
+    "jest": "24.9.0",
+    "rimraf": "^3.0.0",
+    "typescript": "~3.8.3"
+  }
+}

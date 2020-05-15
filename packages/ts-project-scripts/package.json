@@ -1,0 +1,50 @@
+{
+  "name": "@jtbennett/ts-project-scripts",
+  "version": "1.0.0-beta1",
+  "keywords": [],
+  "description": "Scripts for Create Typescript Project.",
+  "author": "John Bennett <john@jtbennett.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtbennett/create-ts-project.git",
+    "directory": "packages/ctsp-template"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/jtbennett/create-ts-project/issues"
+  },
+  "files": [
+    "lib/**/*",
+    "templates/**/*"
+  ],
+  "bin": {
+    "tsp": "./lib/index.js"
+  },
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "dev": "ts-node ./src/index.ts",
+    "lint": "eslint ./src --ext .ts --env node",
+    "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
+    "clean": "rimraf ./lib",
+    "build": "tsc --build",
+    "verify": "yarn lint --max-warnings 0 && yarn test && yarn clean && yarn build"
+  },
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "ncp": "^2.0.0",
+    "rimraf": "^3.0.0",
+    "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "@types/ncp": "^2.0.3",
+    "@types/rimraf": "^2.0.2",
+    "@types/yargs": "^11.0.0",
+    "eslint": "^6.8.0",
+    "jest": "24.9.0",
+    "ts-node": "^8.10.1",
+    "typescript": "~3.8.3"
+  }
+}

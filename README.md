@@ -1,6 +1,8 @@
-# @jtbennett/ts-project
+# @jtbennett/create-ts-project
 
 _For detailed information, [see the documentation](./docs/README.md)._
+
+![Build](https://github.com/jtbennett/create-ts-project/workflows/Build/badge.svg?branch=master)
 
 ## Intro
 
@@ -30,3 +32,7 @@ For continuous integration (CI):
 - github actions - running continuous integration (CI) and deploying on each commit.
 - github packages - hosting docker images
 - Docker - output of build process is a Docker image.
+
+## License
+
+Create Typescript Project is licensed under the [MIT license](./LICENSE).

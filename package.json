@@ -9,7 +9,7 @@
     ]
   },
   "scripts": {
-    "purge:all": " rimraf ./node_modules && rimraf ./packages/**/node_modules || rimraf ./packages/**/lib || rimraf ./packages/**/coverage",
+    "purge:all": "rimraf './**/lib' './**/*.tsBuildInfo' './**/coverage' './**/node_modules'",
     "lint:all": "yarn workspaces foreach run lint",
     "test:all": "yarn workspaces foreach run test",
     "clean:all": "yarn workspaces foreach run clean",
@@ -26,7 +26,7 @@
     "eslint-plugin-jest": "^23.9.0",
     "eslint-plugin-node": "^11.1.0",
     "jest": "24.9.0",
-    "prettier": "2.0.5",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "ts-jest": "^24.0.2",
     "typescript": "~3.8.3"
