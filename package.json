@@ -14,7 +14,7 @@
     "test:all": "yarn workspaces foreach run test",
     "clean:all": "yarn workspaces foreach run clean",
     "build:all": "yarn workspaces foreach run build",
-    "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all"
+    "verify:all": "yarn test:all && yarn clean:all && yarn build:all && yarn lint:all --max-warnings 0"
   },
   "devDependencies": {
     "@types/jest": "24.0.18",
