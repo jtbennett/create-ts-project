@@ -1,14 +1,17 @@
 import { Argv } from "yargs";
 
-import { handlerWrapper } from "../handlerWrapper";
-import { globalOptions } from "../options";
+import { commandHandler, cliOptions } from "@jtbennett/ts-project-cli-utils";
+
+import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
 
-const handler = handlerWrapper<{
-  pkgName: string;
-  force?: boolean;
-}>(async (args) => {
-  await new Package({ name: args.pkgName, dryRun: !!args.dryRun }).delete(
+const handler = commandHandler<
+  TspScriptsOptions & {
+    pkgName: string;
+    force?: boolean;
+  }
+>((args) => {
+  new Package({ name: args.pkgName, dryRun: !!args.dryRun }).delete(
     !!args.force,
   );
 });
@@ -29,7 +32,8 @@ export const removePackage = {
           describe:
             "Allow removal when references to the package exist. References will also be removed.",
         },
-        ...globalOptions,
+        ...cliOptions,
+        ...tspScriptsOptions,
       }),
 
   handler,

@@ -1,27 +1,23 @@
-import { basename } from "path";
-import { files } from "./getFiles";
-import { TspError } from "./TspError";
-
-export interface Tsconfig {
-  references: { path: string }[];
-  compilerOptions: {
-    paths: { [key: string]: string[] };
-  };
-}
-
-export interface PackageFile {
-  name: string;
-  dependencies: { [key: string]: string };
-  nodemonConfig?: { watch: string[] };
-}
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+import { basename, join } from "path";
+import {
+  getFiles,
+  CliError,
+  Files,
+  Tsconfig,
+  PackageJson,
+} from "@jtbennett/ts-project-cli-utils";
+import { getPaths, Paths } from "./paths";
 
 export class Package {
+  paths: Paths;
+  files: Files;
   name: string;
   template: string;
   dirName: string;
   dryRun: boolean;
   tsconfig?: Tsconfig;
-  packageJson?: PackageFile;
+  packageJson?: PackageJson;
   path: string;
 
   constructor(options: {
@@ -30,8 +26,10 @@ export class Package {
     dirName?: string;
     dryRun?: boolean;
     tsconfig?: Tsconfig;
-    packageJson?: PackageFile;
+    packageJson?: PackageJson;
   }) {
+    this.files = getFiles();
+    this.paths = getPaths();
     this.name = options.name;
     this.template = options.template || "";
     this.dirName = options.dirName || this.getNameWithoutScope();
@@ -39,19 +37,25 @@ export class Package {
     this.tsconfig = options.tsconfig;
     this.packageJson = options.packageJson;
 
-    this.path = files.getPackagePath(this.dirName);
+    this.path = this.paths.getPackagePath(this.dirName);
   }
 
   static loadAll() {
-    return files.getAllPackagePaths().map((path) => Package.load(path));
+    return getPaths()
+      .getAllPackagePaths()
+      .map((path) => Package.load(path));
   }
 
   static load(path: string) {
-    const tsconfig = files.loadJson<Tsconfig>(path, "tsconfig.json");
+    const files = getFiles();
+
+    const tsconfig = files.readJsonSync<Tsconfig>(join(path, "tsconfig.json"));
     tsconfig.references = tsconfig.references || [];
     tsconfig.compilerOptions.paths = tsconfig.compilerOptions.paths || {};
 
-    const packageJson = files.loadJson<PackageFile>(path, "package.json");
+    const packageJson = files.readJsonSync<PackageJson>(
+      join(path, "package.json"),
+    );
     packageJson.dependencies = packageJson.dependencies || {};
 
     const name = packageJson.name;
@@ -60,23 +64,22 @@ export class Package {
     return new Package({ name, dirName, packageJson, tsconfig });
   }
 
-  async create() {
-    const templatePath = files.getTemplatePath(this.template);
+  create() {
+    const templatePath = this.paths.getTemplatePath(this.template);
 
-    await files.copyDir(templatePath, this.path);
+    this.files.copySync(templatePath, this.path);
 
-    const json = files.loadJson(
-      files.dryRun ? templatePath : this.path,
-      "package.json",
+    const json = this.files.readJsonSync(
+      join(this.files.dryRun ? templatePath : this.path, "package.json"),
     );
     json.name = this.name;
-    files.saveJson(json, this.path, "package.json");
+    this.files.writeJsonSync(join(this.path, "package.json"), json);
 
     this.packageJson = json;
-    this.tsconfig = files.loadJson(this.path, "tsconfig.json");
+    this.tsconfig = this.files.readJsonSync(join(this.path, "tsconfig.json"));
   }
 
-  async delete(force = false) {
+  delete(force = false) {
     const details = Package.loadAll();
     const dependents = details.filter(
       (pkg) =>
@@ -90,7 +93,7 @@ export class Package {
       if (force) {
         dependents.forEach((dep) => dep.removeReferenceTo(this));
       } else {
-        throw new TspError(
+        throw new CliError(
           `"${this.name}" is referenced by other packages. ` +
             "Use the '--force' option to remove the package and all references to it.\nReferenced by:\n\t" +
             dependents.map((r) => r.packageJson!.name).join("\n\t"),
@@ -98,7 +101,7 @@ export class Package {
       }
     }
 
-    await files.deleteDir(this.path);
+    this.files.removeSync(this.path);
   }
 
   addReferenceTo(dependency: Package) {
@@ -111,7 +114,7 @@ export class Package {
       ref.path.endsWith(`/${dependency.dirName}`),
     );
     if (refIndex < 0) {
-      references.push({ path: `../${dependency.name}` });
+      references.push({ path: `../${dependency.dirName}` });
     }
 
     if (!paths[dependency.name]) {
@@ -133,8 +136,11 @@ export class Package {
       }
     }
 
-    files.saveJson(this.tsconfig!, this.path, "tsconfig.json");
-    files.saveJson(this.packageJson!, this.path, "package.json");
+    this.files.writeJsonSync(join(this.path, "tsconfig.json"), this.tsconfig!);
+    this.files.writeJsonSync(
+      join(this.path, "package.json"),
+      this.packageJson!,
+    );
   }
 
   removeReferenceTo(dependency: Package) {
@@ -168,8 +174,11 @@ export class Package {
       }
     }
 
-    files.saveJson(this.tsconfig!, this.path, "tsconfig.json");
-    files.saveJson(this.packageJson!, this.path, "package.json");
+    this.files.writeJsonSync(join(this.path, "tsconfig.json"), this.tsconfig!);
+    this.files.writeJsonSync(
+      join(this.path, "package.json"),
+      this.packageJson!,
+    );
   }
 
   private getNameWithoutScope() {
@@ -179,7 +188,7 @@ export class Package {
 
     const delimPos = this.name.indexOf("/");
     if (delimPos < 2) {
-      throw new TspError(
+      throw new CliError(
         "Scoped name starts with '@', but does not contain a '/'.",
       );
     }

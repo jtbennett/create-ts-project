@@ -1,5 +1,5 @@
 {
-  "name": "@jtbennett/ts-project-scripts",
+  "name": "@jtbennett/create-ts-project",
   "version": "1.0.0-beta1",
   "keywords": [],
   "description": "Scripts for Create Typescript Project.",
@@ -18,14 +18,14 @@
   },
   "files": [
     "lib/**/*",
-    "templates/**/*"
+    "template/**/*"
   ],
   "bin": {
     "tsp": "./lib/index.js"
   },
   "types": "lib/index.d.ts",
   "scripts": {
-    "dev": "yarn build && ts-node ./src/index.ts",
+    "dev": "yarn workspace @jtbennett/ts-project-cli-utils build && ts-node ./src/index.ts",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
     "clean": "rimraf ./lib",
@@ -36,12 +36,16 @@
     "@jtbennett/ts-project-cli-utils": "1.0.0-beta1",
     "chalk": "^4.0.0",
     "fs-extra": "^9.0.0",
+    "semver": "7.3.2",
+    "validate-npm-package-name": "3.0.0",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.0",
     "@types/node": "^12.7.8",
     "@types/rimraf": "^2.0.2",
+    "@types/semver": "5.5.0",
+    "@types/validate-npm-package-name": "^3.0.0",
     "@types/yargs": "^15.0.0",
     "eslint": "^6.8.0",
     "jest": "24.9.0",

@@ -1,0 +1,41 @@
+// Shared typescript compilerOptions for packages that will run in node.
+// The tsconfig.json file in each sub-folder of "packages/" extends this file.
+
+// Don't try to include paths in this file, as some will be
+// relative to this file and some relative to the extending tsconfig.json.
+// It's more confusing than it's worth.
+
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    // es2019 requires node >= 12.x.
+    "target": "es2019",
+    "lib": ["es2019"],
+
+    // Allow package to be referenced by other packages.
+    "composite": true,
+
+    // Including "types" prevents auto-load of  @types/* from all ancestor
+    // node_modules folders. tsc will always load types for modules you import.
+    // Adding "node" gives us node built-in modules and globals (e.g., path, console).
+    // Adding jest gives us node globals (e.g., jest, describe, it).
+    // "@types/node" and "@types/jest" must be in the root package devDependencies.
+    "types": ["node", "jest"],
+
+    // These are helpful for developer experience.
+    "declarationMap": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+
+    // We want to be as strict as we can...
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "strict": true
+
+    // ...but we're practical, so we disable these.
+    // "suppressImplicitAnyIndexErrors": true,
+    // "strictPropertyInitialization": false
+  }
+}

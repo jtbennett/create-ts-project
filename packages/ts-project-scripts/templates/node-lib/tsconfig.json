@@ -13,7 +13,6 @@
   "include": ["src/**/*.ts", "src/**/*.json"],
   "exclude": [
     "lib",
-    "templates",
     "src/jest",
     "src/**/*.test.ts",
     "src/**/__mocks__"

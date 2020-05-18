@@ -1,20 +1,22 @@
 import { Argv } from "yargs";
 
-import { handlerWrapper } from "../handlerWrapper";
-import { globalOptions } from "../options";
-import { Package } from "../Package";
-import { TspError } from "../TspError";
+import { commandHandler, cliOptions, CliError } from "@jtbennett/ts-project-cli-utils";
 
-const handler = handlerWrapper<{
-  from: string;
-  to: string;
-}>((args) => {
+import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
+import { Package } from "../Package";
+
+const handler = commandHandler<
+  TspScriptsOptions & {
+    from: string;
+    to: string;
+  }
+>((args) => {
   const all = Package.loadAll();
   const fromPkg = all.find((pkg) => pkg.packageJson!.name === args.from);
   const toPkg = all.find((pkg) => pkg.packageJson!.name === args.to);
 
   const pkgNotFoundError = (name: string) =>
-    new TspError(
+    new CliError(
       `Package "${name}" was not found. The value must match the "name" property in package.json.`,
     );
 
@@ -47,7 +49,8 @@ export const removeReference = {
           "Name of the package is depended upon by --from. Name must match what is in package.json.",
         demand: true,
       },
-      ...globalOptions,
+      ...cliOptions,
+      ...tspScriptsOptions,
     }),
 
   handler,

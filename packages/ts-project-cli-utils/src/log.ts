@@ -1,7 +1,17 @@
 import { gray, green, yellow, red } from "chalk";
 
+let verbose = false;
+
+export const setVerbose = (value: boolean) => {
+  verbose = value;
+};
+
 export const log = {
-  verbose: (message: string) => console.log(gray(message)),
+  verbose: (message: string) => {
+    if (verbose) {
+      console.log(gray(message));
+    }
+  },
   info: (message: string) => console.log(message),
   success: (message: string) => console.log(green(message)),
   warn: (message: string) => console.log(yellow(`WARNING: ${message}`)),
