@@ -26,7 +26,7 @@
     "template/**/*"
   ],
   "bin": {
-    "tsp": "./lib/index.js"
+    "create-ts-project": "./lib/index.js"
   },
   "types": "lib/index.d.ts",
   "scripts": {
