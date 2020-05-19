@@ -13,10 +13,11 @@
     "test:all": "yarn workspaces run test",
     "clean:all": "yarn workspaces run clean",
     "build:all": "yarn workspaces run build",
-    "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all"
+    "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all",
+    "tsp": "tsp"
   },
   "devDependencies": {
-    "@jtbennett/ts-project-scripts": "1.0.0-beta1",
+    "@jtbennett/ts-project-scripts": "^1.0.0-beta1",
     "@types/jest": "24.0.18",
     "@types/node": "^12.7.8",
     "@typescript-eslint/eslint-plugin": "^2.31.0",

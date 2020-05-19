@@ -34,7 +34,7 @@
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
     "clean": "rimraf ./lib tsconfig.tsBuildInfo",
-    "build": "tsc --build",
+    "build": "tsc --build && chmod +x ./lib/index.js",
     "verify": "yarn lint --max-warnings 0 && yarn test && yarn clean && yarn build"
   },
   "dependencies": {

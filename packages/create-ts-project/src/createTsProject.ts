@@ -156,14 +156,18 @@ const copyTemplateToProjectDir = (
 
 const updateRootPackageJson = (projectPath: string, projectName: string) => {
   const files = getFiles();
-  const rootPackageJson = files.readJsonSync<PackageJson>(
+  const templateVersion = files.readJsonSync<PackageJson>(
+    join(__dirname, "..", "package.json"),
+  ).version;
+
+  const projectPackageJson = files.readJsonSync<PackageJson>(
     join(projectPath, "package.json"),
   );
-  rootPackageJson.name = projectName;
-  rootPackageJson.devDependencies[
+  projectPackageJson.name = projectName;
+  projectPackageJson.devDependencies[
     "@jtbennett/ts-project-scripts"
-  ] = `^${rootPackageJson.version}`;
-  files.writeJsonSync(join(projectPath, "package.json"), rootPackageJson);
+  ] = `^${templateVersion}`;
+  files.writeJsonSync(join(projectPath, "package.json"), projectPackageJson);
 };
 
 const runYarnInstall = (dryRun: boolean) => {
