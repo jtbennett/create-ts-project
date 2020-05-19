@@ -10,51 +10,48 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      # - uses: actions/setup-node@v1
-      #   with:
-      #     node-version: 12.x
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
 
-      # - name: Cache .yarn outside repo
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ../.yarn
-      #     key: ${{ runner.os }}-yarn-2-${{ hashFiles('./yarn.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-yarn-2-
+      - name: Cache .yarn outside repo
+        uses: actions/cache@v1
+        with:
+          path: ../.yarn
+          key: ${{ runner.os }}-yarn-2-${{ hashFiles('./yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-2-
 
-      # - name: Copy some .yarn contents into repo
-      #   run: |
-      #     cp -R ../.yarn/cache ./.yarn || :
-      #     cp -R ../.yarn/unplugged ./.yarn || :
-      #     cp ../.yarn/build-state.yml ./.yarn || :
-      #     cp ../.yarn/install-state.gz ./.yarn || :
+      - name: Copy some .yarn contents into repo
+        run: |
+          cp -R ../.yarn/cache ./.yarn || :
+          cp -R ../.yarn/unplugged ./.yarn || :
+          cp ../.yarn/build-state.yml ./.yarn || :
+          cp ../.yarn/install-state.gz ./.yarn || :
 
-      # - name: Lint, test, build
-      #   run: |
-      #     yarn
-      #     yarn verify:all
+      - name: Lint, test, build
+        run: |
+          yarn
+          yarn verify:all
 
-      - name: Set release version
-        id: vars
+      - name: Set release version from tag
+        id: version
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
-          echo ::set-output name=VERSION::$(echo '${{ github.ref }}' | cut -c 11-)
+          echo ::set-output name=VERSION::$(echo '${{ github.ref }}' | cut -c 12-)
 
       - name: Release
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          RELEASE_VERSION: $(${{ github.ref }} | cut -c 11-)
         run: |
-          echo RELEASE_VERSION ${RELEASE_VERSION}
-          echo VERSION ${{ steps.vars.outputs.VERSION }}
-        # node ./packages/ts-project-scripts/lib/index.js \
-        #   release --ver 1.0.0-beta5 \
-        #   @jtbennett/ts-project-cli-utils \
-        #   @jtbennett/ts-project-scripts \
-        #   @jtbennett/create-ts-project \
-        #   --dry-run
+          node ./packages/ts-project-scripts/lib/index.js \
+            release --set-version ${{ steps.version.outputs.VERSION }} \
+            @jtbennett/ts-project-cli-utils \
+            @jtbennett/ts-project-scripts \
+            @jtbennett/create-ts-project \
+            --dry-run
