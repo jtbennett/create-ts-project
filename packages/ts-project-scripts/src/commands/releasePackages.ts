@@ -44,7 +44,7 @@ const handler = commandHandler<
     pkg.setVersion(args.setVersion);
 
     const publishCommand =
-      `npm publish` +
+      `npm publish ${pkg.path}` +
       (args.dryRun ? " --dry-run" : "") +
       (args.access ? ` --access ${args.access}` : "") +
       (args.tag ? ` --tag ${args.tag}` : "") +
