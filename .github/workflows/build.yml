@@ -41,7 +41,7 @@ jobs:
         id: vars
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
-          echo ::set-output VERSION=$(${{ github.ref }} | cut -c 11-)
+          echo ::set-output name=VERSION::$(${{ github.ref }} | cut -c 11-)
 
       - name: Release
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
