@@ -2,7 +2,7 @@ import { CliError } from "./CliError";
 import { CliOptions } from "./cliOptions";
 import { log, logAndExit } from "./log";
 
-export const commandHandler = <TArgs extends Pick<CliOptions, "verbose">>(
+export const commandHandler = <TArgs extends CliOptions>(
   commandFunc: (args: TArgs) => any,
 ) => (args: TArgs) => {
   if (args.verbose) {

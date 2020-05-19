@@ -103,6 +103,13 @@ export class Package {
     this.files.removeSync(this.path);
   }
 
+  setVersion(version: string) {
+    const packageJsonPath = join(this.path, "package.json");
+    const json = this.files.readJsonSync(packageJsonPath);
+    json.version = version;
+    this.files.writeJsonSync(packageJsonPath, json);
+  }
+
   addReferenceTo(dependency: Package) {
     const {
       references,

@@ -18,12 +18,12 @@ const handler = commandHandler(createTsProject);
   .usage("Usage: $0 <project-name>")
 
   .middleware((argv) => {
-    setVerbose(argv.verbose);
+    setVerbose(!!argv.verbose);
     if (argv.verbose) {
       log.success("Verbose logging enabled.");
     }
 
-    configureFiles({ dryRun: argv.dryRun });
+    configureFiles({ dryRun: !!argv.dryRun });
     if (argv.dryRun) {
       log.success(
         "This is a dry run. No files will be created, modified or deleted.",

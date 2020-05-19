@@ -199,8 +199,8 @@ export const createTsProject = (args: CliOptions & { projectName: string }) => {
   copyTemplateToProjectDir(templatePath, projectPath);
   setProjectName(args.dryRun ? templatePath : projectPath, args.projectName);
 
-  updateYarn(args.dryRun);
-  runYarnInstall(args.dryRun);
+  updateYarn(!!args.dryRun);
+  runYarnInstall(!!args.dryRun);
 
   printInstructions();
 };

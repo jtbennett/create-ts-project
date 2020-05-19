@@ -28,7 +28,7 @@ export const addPackage = {
       .positional("pkg-name", {
         desc: "Name of the package to add",
         type: "string",
-      } as any)
+      })
       .options({
         template: {
           alias: "t",

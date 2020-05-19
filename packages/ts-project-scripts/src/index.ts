@@ -13,17 +13,19 @@ import { addPackage } from "./commands/addPackage";
 import { removePackage } from "./commands/removePackage";
 import { addReference } from "./commands/addReference";
 import { removeReference } from "./commands/removeReference";
+import { releasePackages } from "./commands/releasePackages";
 
 (yargs as yargs.Argv<CliOptions>)
+  .version(false)
   .usage("Usage: $0 <command> [options]")
 
   .middleware((argv) => {
-    setVerbose(argv.verbose);
+    setVerbose(!!argv.verbose);
     if (argv.verbose) {
       log.success("Verbose logging enabled.");
     }
 
-    configureFiles({ dryRun: argv.dryRun });
+    configureFiles({ dryRun: !!argv.dryRun });
     if (argv.dryRun) {
       log.success(
         "This is a dry run. No files will be created, modified or deleted.",
@@ -36,9 +38,11 @@ import { removeReference } from "./commands/removeReference";
   .command(addReference as any)
   .command(removeReference as any)
 
+  .command(releasePackages as any)
+
   .demandCommand(1, "You must enter a command.")
   .help()
   .epilog(
-    "More information available at:\nhttps://github.com/jtbennett/create-ts-project/blob/master/packages/ts-project-scripts",
+    "More information available at:\nhttps://github.com/jtbennett/create-ts-project",
   )
   .wrap(Math.min(90, yargs.terminalWidth())).argv;

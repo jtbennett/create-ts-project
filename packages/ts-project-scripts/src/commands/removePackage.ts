@@ -25,7 +25,7 @@ export const removePackage = {
       .positional("pkg-name", {
         desc: "Name of the package to remove.",
         type: "string",
-      } as any)
+      })
       .options({
         force: {
           boolean: true,

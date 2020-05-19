@@ -1,8 +1,8 @@
 import { Options } from "yargs";
 
 export interface CliOptions {
-  dryRun: boolean;
-  verbose: boolean;
+  dryRun?: boolean;
+  verbose?: boolean;
 }
 
 export const cliOptions: { [key: string]: Options } = {
