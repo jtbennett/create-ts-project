@@ -17,9 +17,11 @@ export class Paths {
       let currentDir = process.cwd();
       let isProjectRoot = false;
       do {
-        currentDir = dirname(currentDir);
         const yarnLockPath = join(currentDir, "yarn.lock");
         isProjectRoot = existsSync(yarnLockPath);
+        if (!isProjectRoot) {
+          currentDir = dirname(currentDir);
+        }
       } while (!isProjectRoot && currentDir.length > 1);
 
       if (!isProjectRoot) {
