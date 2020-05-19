@@ -152,6 +152,10 @@ const copyTemplateToProjectDir = (
     overwrite: false,
     errorOnExist: false,
   });
+  files.moveSync(
+    join(projectPath, "tsp.gitignore"),
+    join(projectPath, ".gitignore"),
+  );
 };
 
 const updateRootPackageJson = (projectPath: string, projectName: string) => {
@@ -170,12 +174,12 @@ const updateRootPackageJson = (projectPath: string, projectName: string) => {
   files.writeJsonSync(join(projectPath, "package.json"), projectPackageJson);
 };
 
-const runYarnInstall = (dryRun: boolean) => {
+const runYarnInstall = (projectPath: string, dryRun: boolean) => {
   if (dryRun) {
-    log.info('[DRYRUN] Running "yarn install".');
+    log.info('[DRYRUN] Running "yarnpkg install".');
   } else {
-    log.info('Running "yarn install".');
-    execSync("yarnpkg install", { stdio: "inherit" });
+    log.info('Running "yarnpkg install".');
+    execSync("yarnpkg install", { cwd: projectPath, stdio: "inherit" });
   }
 };
 
@@ -198,7 +202,7 @@ export const createTsProject = (args: CliOptions & { projectName: string }) => {
     args.projectName,
   );
 
-  runYarnInstall(!!args.dryRun);
+  runYarnInstall(projectPath, !!args.dryRun);
 
   printInstructions();
 };

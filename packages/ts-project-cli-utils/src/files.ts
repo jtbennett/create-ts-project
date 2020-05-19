@@ -6,6 +6,8 @@ import {
   readFileSync,
   removeSync,
   writeFileSync,
+  moveSync,
+  MoveOptions,
 } from "fs-extra";
 
 import { log } from "./log";
@@ -31,19 +33,32 @@ export class Files {
   }
 
   copySync(
-    sourcePath: string,
-    destinationPath: string,
+    src: string,
+    dest: string,
     options: CopyOptionsSync = { overwrite: false, errorOnExist: true },
   ) {
-    this.throwIfMissing(sourcePath);
+    this.throwIfMissing(src);
     if (options.errorOnExist) {
-      this.throwIfExists(destinationPath);
+      this.throwIfExists(dest);
     }
     if (this.dryRun) {
-      log.info(`[DRYRUN] Copying from: ${sourcePath} to ${destinationPath}`);
+      log.info(`[DRYRUN] Copying from: ${src} to ${dest}`);
     } else {
-      log.info(`Copying from: ${sourcePath} to ${destinationPath}`);
-      return copySync(sourcePath, destinationPath, options);
+      log.info(`Copying from: ${src} to ${dest}`);
+      return copySync(src, dest, options);
+    }
+  }
+
+  moveSync(
+    src: string,
+    dest: string,
+    options: MoveOptions = { overwrite: false },
+  ) {
+    if (this.dryRun) {
+      log.info(`[DRYRUN] Moving "${src}" to "${dest}"`);
+    } else {
+      log.info(`Moving "${src}" to "${dest}"`);
+      moveSync(src, dest, options);
     }
   }
 
