@@ -9,7 +9,7 @@
     "rootDir": "./src",
     "outDir": "./lib",
     "composite": true,
-    "tsBuildInfoFile": "./lib/tsconfig.tsBuildInfo",
+    "tsBuildInfoFile": "./tsconfig.tsBuildInfo",
     "baseUrl": ".",
     "paths": {
       "@jtbennett/ts-project-cli-utils": ["../ts-project-cli-utils/src"]
