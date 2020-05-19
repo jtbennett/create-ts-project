@@ -38,7 +38,7 @@ jobs:
       #     yarn verify:all
       
       - name: Release
-        if: ${{ startsWith(github.ref, 'refs/tags/v' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         env:
           RELEASE_VERSION: $(echo ${GITHUB_REF:10})
         run: |
