@@ -160,20 +160,10 @@ const updateRootPackageJson = (projectPath: string, projectName: string) => {
     join(projectPath, "package.json"),
   );
   rootPackageJson.name = projectName;
-  rootPackageJson.devDependencies["@jtbennett/ts-project-scripts"] =
-    `^${rootPackageJson.version}`;
+  rootPackageJson.devDependencies[
+    "@jtbennett/ts-project-scripts"
+  ] = `^${rootPackageJson.version}`;
   files.writeJsonSync(join(projectPath, "package.json"), rootPackageJson);
-};
-
-const updateYarn = (dryRun: boolean) => {
-  if (dryRun) {
-    log.info(
-      "[DRYRUN] Updating local version of yarn in the project folder to latest.",
-    );
-  } else {
-    log.info("Updating local version of yarn in the project folder to latest.");
-    execSync("yarnpkg set version latest", { stdio: "inherit" });
-  }
 };
 
 const runYarnInstall = (dryRun: boolean) => {
@@ -204,7 +194,6 @@ export const createTsProject = (args: CliOptions & { projectName: string }) => {
     args.projectName,
   );
 
-  updateYarn(!!args.dryRun);
   runYarnInstall(!!args.dryRun);
 
   printInstructions();

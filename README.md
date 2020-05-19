@@ -33,6 +33,21 @@ For continuous integration (CI):
 - github packages - hosting docker images
 - Docker - output of build process is a Docker image.
 
+## Setting up for development of create-ts-project
+
+You must be running `node v12.x` or later and have `yarn v1.12` or later installed globally.
+
+**One-time setup:**
+
+```bash
+# Clone the repo.
+git clone https://github.com/jtbennett/create-ts-project.git
+cd create-ts-project
+
+# Install packages from npm.
+yarn
+```
+
 ## License
 
 Create Typescript Project is licensed under the [MIT license](./LICENSE).

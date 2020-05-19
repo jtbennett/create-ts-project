@@ -9,10 +9,10 @@
   },
   "scripts": {
     "purge:all": "rimraf './**/lib' './**/*.tsBuildInfo' './**/coverage' './**/node_modules'",
-    "lint:all": "yarn workspaces foreach run lint",
-    "test:all": "yarn workspaces foreach run test",
-    "clean:all": "yarn workspaces foreach run clean",
-    "build:all": "yarn workspaces foreach run build",
+    "lint:all": "yarn workspaces run lint",
+    "test:all": "yarn workspaces run test",
+    "clean:all": "yarn workspaces run clean",
+    "build:all": "yarn workspaces run build",
     "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all"
   },
   "devDependencies": {

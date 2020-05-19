@@ -1,13 +1,18 @@
 {
   "name": "@jtbennett/create-ts-project",
   "version": "1.0.0-beta1",
-  "keywords": [],
-  "description": "Scripts for Create Typescript Project.",
+  "keywords": [
+    "typescript",
+    "monorepo",
+    "create",
+    "project"
+  ],
+  "description": "Create Typescript monorepos with project references, eslint, prettier, and jest configured and ready for development.",
   "author": "John Bennett <john@jtbennett.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/jtbennett/create-ts-project.git",
-    "directory": "packages/ctsp-template"
+    "directory": "packages/create-ts-project"
   },
   "license": "MIT",
   "engines": {
@@ -25,7 +30,7 @@
   },
   "types": "lib/index.d.ts",
   "scripts": {
-    "dev": "yarn workspace @jtbennett/ts-project-cli-utils build && ts-node ./src/index.ts",
+    "dev": "yarn build && ts-node ./src/index.ts",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
     "clean": "rimraf ./lib tsconfig.tsBuildInfo",

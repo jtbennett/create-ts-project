@@ -1,13 +1,18 @@
 {
   "name": "@jtbennett/ts-project-scripts",
   "version": "1.0.0-beta1",
-  "keywords": [],
+  "keywords": [
+    "typescript",
+    "monorepo",
+    "create",
+    "project"
+  ],
   "description": "Scripts for Create Typescript Project.",
   "author": "John Bennett <john@jtbennett.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/jtbennett/create-ts-project.git",
-    "directory": "packages/ctsp-template"
+    "directory": "packages/ts-project-scripts"
   },
   "license": "MIT",
   "engines": {
