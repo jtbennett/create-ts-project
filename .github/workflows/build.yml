@@ -53,11 +53,12 @@ jobs:
       - name: Release
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           node ./packages/ts-project-scripts/lib/index.js \
-            release --set-version ${{ steps.version.outputs.VERSION }} \
+            release \
+            --access public \
+            --set-version ${{ steps.version.outputs.VERSION }} \
             @jtbennett/ts-project-cli-utils \
             @jtbennett/ts-project-scripts \
             @jtbennett/create-ts-project
