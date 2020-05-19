@@ -60,5 +60,4 @@ jobs:
             release --set-version ${{ steps.version.outputs.VERSION }} \
             @jtbennett/ts-project-cli-utils \
             @jtbennett/ts-project-scripts \
-            @jtbennett/create-ts-project \
-            --dry-run
+            @jtbennett/create-ts-project
