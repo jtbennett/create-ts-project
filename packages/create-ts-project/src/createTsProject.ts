@@ -154,12 +154,14 @@ const copyTemplateToProjectDir = (
   });
 };
 
-const setProjectName = (projectPath: string, projectName: string) => {
+const updateRootPackageJson = (projectPath: string, projectName: string) => {
   const files = getFiles();
   const rootPackageJson = files.readJsonSync<PackageJson>(
     join(projectPath, "package.json"),
   );
   rootPackageJson.name = projectName;
+  rootPackageJson.devDependencies["@jtbennett/ts-project-scripts"] =
+    `^${rootPackageJson.version}`;
   files.writeJsonSync(join(projectPath, "package.json"), rootPackageJson);
 };
 
@@ -197,7 +199,10 @@ export const createTsProject = (args: CliOptions & { projectName: string }) => {
 
   ensureProjectDir(projectPath);
   copyTemplateToProjectDir(templatePath, projectPath);
-  setProjectName(args.dryRun ? templatePath : projectPath, args.projectName);
+  updateRootPackageJson(
+    args.dryRun ? templatePath : projectPath,
+    args.projectName,
+  );
 
   updateYarn(!!args.dryRun);
   runYarnInstall(!!args.dryRun);
