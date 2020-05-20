@@ -1,18 +1,17 @@
 {
-  "name": "node-app",
+  "name": "node-server",
+  "private": true,
   "description": "",
   "version": "1.0.0",
   "keywords": [],
   "author": "",
-  "license": "",
+  "license": "unlicensed",
   "engines": {
     "node": ">=12.0.0"
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": [
-    "lib/**/*"
-  ],
+  "files": ["lib/**/*"],
   "scripts": {
     "dev": "concurrently -k -n 'tsc,app' -c 'cyan,green' 'tsc --build --watch --preserveWatchOutput' 'nodemon'",
     "lint": "eslint ./src --ext .ts --env node",
@@ -24,11 +23,7 @@
   "nodemonConfig": {
     "exec": "ts-node ./src/index.ts --files",
     "ext": "ts,json",
-    "ignore": [
-      "./src/jest",
-      "./src/**/*.test.ts",
-      "./src/**/__mocks__"
-    ],
+    "ignore": ["./src/jest", "./src/**/*.test.ts", "./src/**/__mocks__"],
     "watch": [
       ".env",
       "./src",
