@@ -107,11 +107,15 @@ export class Files {
 
   writeJsonSync(path: string, json: {}) {
     // TODO: Use jsonc-parser for tsconfig, so we preserve comments.
+    this.writeFileSync(path, JSON.stringify(json, null, 2));
+  }
+
+  writeFileSync(path: string, value: string) {
     if (this.dryRun) {
       log.info(`[DRYRUN] Updating file: ${path}`);
     } else {
       log.info(`Updating file: ${path}`);
-      writeFileSync(path, JSON.stringify(json, null, 2));
+      writeFileSync(path, value);
     }
   }
 
