@@ -10,7 +10,6 @@ import {
 } from "@jtbennett/ts-project-cli-utils";
 
 import { addPackage } from "./commands/addPackage";
-import { removePackage } from "./commands/removePackage";
 import { addReference } from "./commands/addReference";
 import { removeReference } from "./commands/removeReference";
 import { releasePackages } from "./commands/releasePackages";
@@ -34,7 +33,6 @@ import { releasePackages } from "./commands/releasePackages";
   })
 
   .command(addPackage as any)
-  .command(removePackage as any)
   .command(addReference as any)
   .command(removeReference as any)
 

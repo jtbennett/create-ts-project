@@ -1,35 +1,48 @@
 import { Argv } from "yargs";
 
-import { cliOptions, CliError } from "@jtbennett/ts-project-cli-utils";
+import { cliOptions, CliError, log } from "@jtbennett/ts-project-cli-utils";
 
 import { tspHandler } from "../tspHandler";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
 
+const pkgNotFoundError = (name: string) =>
+  new CliError(
+    `Package "${name}" was not found. The value must match the "name" property in package.json.`,
+  );
+
 const handler = tspHandler<
   TspScriptsOptions & {
     from: string;
+    all?: boolean;
     to: string;
   }
 >((args) => {
   const all = Package.loadAll();
-  const fromPkg = all.find((pkg) => pkg.packageJson!.name === args.from);
-  const toPkg = all.find((pkg) => pkg.packageJson!.name === args.to);
 
-  const pkgNotFoundError = (name: string) =>
-    new CliError(
-      `Package "${name}" was not found. The value must match the "name" property in package.json.`,
-    );
+  const fromPackages = args.all
+    ? all.filter((pkg) => pkg.packageJson!.name !== args.to)
+    : all.filter((pkg) => pkg.packageJson!.name === args.from);
 
-  if (!fromPkg) {
+  const toPackage = all.find((pkg) => pkg.packageJson!.name === args.to);
+
+  if (args.from !== "*" && fromPackages.length === 0) {
     throw pkgNotFoundError(args.from);
   }
 
-  if (!toPkg) {
+  if (!toPackage) {
     throw pkgNotFoundError(args.to);
   }
 
-  fromPkg.removeReferenceTo(toPkg);
+  if (fromPackages.length === 0) {
+    log.warn(`No packages found with a reference to "${args.to}"`);
+    // Don't bother running yarn, since we made no changes.
+    args.yarn = false;
+  } else {
+    fromPackages.forEach((pkg) => {
+      pkg.removeReferenceTo(toPackage);
+    });
+  }
 });
 
 export const removeReference = {
@@ -42,7 +55,11 @@ export const removeReference = {
         alias: "f",
         describe:
           "Name of the package that depends on the package in --to. Name must match what is in package.json.",
-        demand: true,
+      },
+      all: {
+        alias: "a",
+        describe:
+          "Remove references to the package in --to from all other packages. --from is ignored.",
       },
       to: {
         alias: "t",

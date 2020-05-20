@@ -79,31 +79,6 @@ export class Package {
     this.tsconfig = this.files.readJsonSync(join(path, name));
   }
 
-  delete(force = false) {
-    const details = Package.loadAll();
-    const dependents = details.filter(
-      (pkg) =>
-        pkg.name !== this.name &&
-        !!pkg.tsconfig!.references.find((ref) =>
-          ref.path.endsWith(`/${this.dirName}`),
-        ),
-    );
-
-    if (dependents.length > 0) {
-      if (force) {
-        dependents.forEach((dep) => dep.removeReferenceTo(this));
-      } else {
-        throw new CliError(
-          `"${this.name}" is referenced by other packages. ` +
-            "Use the '--force' option to remove the package and all references to it.\nReferenced by:\n\t" +
-            dependents.map((r) => r.packageJson!.name).join("\n\t"),
-        );
-      }
-    }
-
-    this.files.removeSync(this.path);
-  }
-
   setVersion(version: string) {
     const packageJsonPath = join(this.path, "package.json");
     const json = this.files.readJsonSync(packageJsonPath);
@@ -151,6 +126,9 @@ export class Package {
   }
 
   removeReferenceTo(dependency: Package) {
+    let tsconfigChanged = false;
+    let packageJsonChanged = false;
+
     const {
       references,
       compilerOptions: { paths },
@@ -160,15 +138,18 @@ export class Package {
     );
     if (refIndex >= 0) {
       references.splice(refIndex, 1);
+      tsconfigChanged = true;
     }
 
     if (paths[dependency.name]) {
       delete paths[dependency.name];
+      tsconfigChanged = true;
     }
 
     const { dependencies } = this.packageJson!;
     if (dependencies[dependency.name]) {
       delete dependencies[dependency.name];
+      packageJsonChanged = true;
     }
 
     const watch = this.packageJson?.nodemonConfig?.watch;
@@ -178,14 +159,23 @@ export class Package {
       );
       if (index >= 0) {
         watch.splice(index, 1);
+        packageJsonChanged = true;
       }
     }
 
-    this.files.writeJsonSync(join(this.path, "tsconfig.json"), this.tsconfig!);
-    this.files.writeJsonSync(
-      join(this.path, "package.json"),
-      this.packageJson!,
-    );
+    if (tsconfigChanged) {
+      this.files.writeJsonSync(
+        join(this.path, "tsconfig.json"),
+        this.tsconfig!,
+      );
+    }
+
+    if (packageJsonChanged) {
+      this.files.writeJsonSync(
+        join(this.path, "package.json"),
+        this.packageJson!,
+      );
+    }
   }
 
   private getNameWithoutScope() {

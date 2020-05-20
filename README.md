@@ -96,19 +96,6 @@ yarn tsp <command> --help
 
     When you build this template, `chmod +x ./lib/index.js` is run, so that the file can be executed directly, without specifying `node`.
 
-- ### `remove`
-
-  Removes a packages and deletes any references to it.
-
-  **This command deletes files.** If you aren't sure about running a command, either be sure you have committed or staged all files in git, or use the `--dry-run` option.
-
-  ```bash
-  yarn tsp remove my-lib
-
-  # If there are existing references to the package, you must use the --force flag.
-  yarn tsp remove my-lib --force
-  ```
-
 - ### `ref`
 
   Adds a reference so that one package in the project can import modules from another package in the project.
@@ -125,11 +112,19 @@ yarn tsp <command> --help
 
 - ### `unref`
 
-  Removes a reference.
+  Removes a reference from one package to another. This includes both the Typescript project reference in `tsconfig.json` and the `package.json` `dependency`.
 
   ```bash
-  yarn tsp ref --from my-server --to my-lib
+  yarn tsp unref --from my-server --to my-lib
   ```
+
+  To remove all references to a package, use `--all`:
+
+  ```bash
+  yarn tsp unref --all --to my-lib
+  ```
+
+  This command does **not** delete the package directory. That is left to the developer.
 
 ### About package and directory names
 
