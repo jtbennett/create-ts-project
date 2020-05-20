@@ -24,7 +24,10 @@ const setNpmRegistryCredentials = () => {
 
   const files = getFiles();
   const path = getNpmrcPath();
-  const originalConfig = readFileSync(path).toString();
+  let originalConfig = "";
+  if (existsSync(path)) {
+    originalConfig = readFileSync(path).toString();
+  }
 
   let lines = originalConfig.split(/\r?\n/);
   lines = lines.filter(
