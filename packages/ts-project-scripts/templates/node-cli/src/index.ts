@@ -1,5 +1,12 @@
+#!/usr/bin/env node
+
 import * as yargs from "yargs";
 
-
-
-console.log("Hello world.", new Date());
+yargs
+  .command({
+    command: "*",
+    handler: () => {
+      console.log("Hello world", new Date());
+    },
+  })
+  .help().argv;
