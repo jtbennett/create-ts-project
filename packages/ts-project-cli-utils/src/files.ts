@@ -52,7 +52,7 @@ export class Files {
     } else {
       log.info(`Copying from: ${src} to ${dest}`);
       copySync(src, dest, options);
-      this.renameTspFilesSync(dest);
+      this.renameTspFilesSync(this.dryRun ? src : dest);
     }
   }
 

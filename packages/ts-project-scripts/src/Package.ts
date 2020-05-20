@@ -68,14 +68,15 @@ export class Package {
 
     this.files.copySync(templatePath, this.path);
 
-    const json = this.files.readJsonSync(
-      join(this.files.dryRun ? templatePath : this.path, "package.json"),
-    );
+    const path = this.files.dryRun ? templatePath : this.path;
+    const name = this.files.dryRun ? "_tsp_package.json" : "package.json";
+
+    const json = this.files.readJsonSync(join(path, name));
     json.name = this.name;
-    this.files.writeJsonSync(join(this.path, "package.json"), json);
+    this.files.writeJsonSync(join(path, name), json);
 
     this.packageJson = json;
-    this.tsconfig = this.files.readJsonSync(join(this.path, "tsconfig.json"));
+    this.tsconfig = this.files.readJsonSync(join(path, name));
   }
 
   delete(force = false) {
