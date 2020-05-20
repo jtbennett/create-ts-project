@@ -21,6 +21,8 @@
   "bugs": {
     "url": "https://github.com/jtbennett/create-ts-project/issues"
   },
+  "main": "lib/index.ts",
+  "types": "lib/index.d.ts",
   "files": [
     "lib/**/*",
     "templates/**/*"
@@ -28,7 +30,6 @@
   "bin": {
     "tsp": "./lib/index.js"
   },
-  "types": "lib/index.d.ts",
   "scripts": {
     "dev": "yarn build && ts-node ./src/index.ts",
     "lint": "eslint ./src --ext .ts --env node",
