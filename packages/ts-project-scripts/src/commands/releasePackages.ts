@@ -39,6 +39,12 @@ const handler = commandHandler<
       );
     }
 
+    if (!process.env.NPM_TOKEN) {
+      throw new CliError(
+        "You must set the NPM_TOKEN environment variable with a valid token before releasing.",
+      );
+    }
+
     log.success(`Publishing ${pkg.name}@${args.setVersion} to npm...`);
 
     pkg.setVersion(args.setVersion);
@@ -50,6 +56,7 @@ const handler = commandHandler<
       (args.tag ? ` --tag ${args.tag}` : "") +
       (args.otp ? ` --otp ${args.otp}` : "");
 
+    log.info(publishCommand);
     execSync(publishCommand, { stdio: "inherit" });
 
     log.success("Publish complete.");
