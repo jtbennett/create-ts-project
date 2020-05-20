@@ -8,7 +8,10 @@ import {
   writeFileSync,
   moveSync,
   MoveOptions,
+  readdirSync,
+  lstatSync,
 } from "fs-extra";
+import { join } from "path";
 
 import { log } from "./log";
 import { CliError } from "./CliError";
@@ -38,15 +41,36 @@ export class Files {
     options: CopyOptionsSync = { overwrite: false, errorOnExist: true },
   ) {
     this.throwIfMissing(src);
+
     if (options.errorOnExist) {
       this.throwIfExists(dest);
     }
+
     if (this.dryRun) {
       log.info(`[DRYRUN] Copying from: ${src} to ${dest}`);
+      this.renameTspFilesSync(src);
     } else {
       log.info(`Copying from: ${src} to ${dest}`);
-      return copySync(src, dest, options);
+      copySync(src, dest, options);
+      this.renameTspFilesSync(dest);
     }
+  }
+
+  renameTspFilesSync(path: string) {
+    const files = readdirSync(path);
+
+    files.forEach((name) => {
+      const filePath = join(path, name);
+
+      if (lstatSync(filePath).isDirectory()) {
+        this.renameTspFilesSync(filePath);
+      }
+
+      if (name.startsWith("_tsp_")) {
+        const dest = join(path, name.substr("_tsp_".length));
+        this.moveSync(filePath, dest);
+      }
+    });
   }
 
   moveSync(

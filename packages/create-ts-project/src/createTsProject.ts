@@ -78,10 +78,6 @@ const isSafeToCreateProjectIn = (projectPath: string) => {
     ".DS_Store",
     ".git",
     ".gitattributes",
-    ".gitignore",
-    ".hg",
-    ".hgcheck",
-    ".hgignore",
     ".npmignore",
     "docs",
     "LICENSE",
@@ -152,10 +148,6 @@ const copyTemplateToProjectDir = (
     overwrite: false,
     errorOnExist: false,
   });
-  files.moveSync(
-    join(projectPath, "tsp.gitignore"),
-    join(projectPath, ".gitignore"),
-  );
 };
 
 const updateRootPackageJson = (projectPath: string, projectName: string) => {
