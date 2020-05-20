@@ -1,11 +1,12 @@
 import { Argv } from "yargs";
 
-import { commandHandler, cliOptions, CliError } from "@jtbennett/ts-project-cli-utils";
+import { cliOptions, CliError } from "@jtbennett/ts-project-cli-utils";
 
+import { tspHandler } from "../tspHandler";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
 
-const handler = commandHandler<
+const handler = tspHandler<
   TspScriptsOptions & {
     from: string;
     to: string;
