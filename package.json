@@ -14,7 +14,7 @@
     "test:all": "yarn workspaces run test",
     "clean:all": "yarn workspaces run clean",
     "build:all": "yarn workspaces run build",
-    "verify:all": "yarn test:all && yarn clean:all && yarn build:all && yarn lint:all --max-warnings 0",
+    "verify:all": "yarn workspaces run verify",
     "tsp": "tsp"
   },
   "devDependencies": {
