@@ -16,9 +16,10 @@
     "dev": "concurrently -k -n 'tsc,app' -c 'cyan,green' 'tsc --build --watch --preserveWatchOutput' 'nodemon'",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
-    "clean": "rimraf ./lib",
+    "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build",
-    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0"
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "purge": "yarn clean && rimraf ./coverage ./node_modules"
   },
   "nodemonConfig": {
     "exec": "ts-node ./src/index.ts --files",

@@ -13,7 +13,7 @@ export class Package {
   files: Files;
   name: string;
   template: string;
-  dirName: string;
+  dir: string;
   dryRun: boolean;
   tsconfig?: Tsconfig;
   packageJson?: PackageJson;
@@ -22,7 +22,7 @@ export class Package {
   constructor(options: {
     name: string;
     template?: string;
-    dirName?: string;
+    dir?: string;
     dryRun?: boolean;
     tsconfig?: Tsconfig;
     packageJson?: PackageJson;
@@ -31,12 +31,12 @@ export class Package {
     this.paths = getPaths();
     this.name = options.name;
     this.template = options.template || "";
-    this.dirName = options.dirName || this.getNameWithoutScope();
+    this.dir = options.dir || this.getNameWithoutScope();
     this.dryRun = !!options.dryRun;
     this.tsconfig = options.tsconfig;
     this.packageJson = options.packageJson;
 
-    this.path = this.paths.getPackagePath(this.dirName);
+    this.path = this.paths.getPackagePath(this.dir);
   }
 
   static loadAll() {
@@ -58,9 +58,9 @@ export class Package {
     packageJson.dependencies = packageJson.dependencies || {};
 
     const name = packageJson.name;
-    const dirName = basename(path);
+    const dir = basename(path);
 
-    return new Package({ name, dirName, packageJson, tsconfig });
+    return new Package({ name, dir, packageJson, tsconfig });
   }
 
   create() {
@@ -93,14 +93,14 @@ export class Package {
     } = this.tsconfig!;
 
     const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dirName}`),
+      ref.path.endsWith(`/${dependency.dir}`),
     );
     if (refIndex < 0) {
-      references.push({ path: `../${dependency.dirName}` });
+      references.push({ path: `../${dependency.dir}` });
     }
 
     if (!paths[dependency.name]) {
-      paths[dependency.name] = [`../${dependency.dirName}/src`];
+      paths[dependency.name] = [`../${dependency.dir}/src`];
     }
 
     const { dependencies } = this.packageJson!;
@@ -111,7 +111,7 @@ export class Package {
     const watch = this.packageJson?.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
-        path.endsWith(`/${dependency.dirName}/lib`),
+        path.endsWith(`/${dependency.dir}/lib`),
       );
       if (index < 0) {
         watch.push(`../${dependency.name}/lib`);
@@ -134,7 +134,7 @@ export class Package {
       compilerOptions: { paths },
     } = this.tsconfig!;
     const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dirName}`),
+      ref.path.endsWith(`/${dependency.dir}`),
     );
     if (refIndex >= 0) {
       references.splice(refIndex, 1);
@@ -155,7 +155,7 @@ export class Package {
     const watch = this.packageJson?.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
-        path.endsWith(`/${dependency.dirName}/lib`),
+        path.endsWith(`/${dependency.dir}/lib`),
       );
       if (index >= 0) {
         watch.splice(index, 1);

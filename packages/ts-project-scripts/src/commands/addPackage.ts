@@ -9,7 +9,7 @@ import { tspHandler } from "../tspHandler";
 const handler = tspHandler<
   TspScriptsOptions & {
     pkgName: string;
-    dirName?: string;
+    dir?: string;
     template: string;
   }
 >((args) => {

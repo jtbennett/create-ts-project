@@ -19,9 +19,10 @@
     "dev": "yarn build && ts-node ./src/index.ts",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
-    "clean": "rimraf ./lib tsconfig.tsBuildInfo",
+    "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build && chmod +x ./lib/index.js",
-    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0"
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "purge": "yarn clean && rimraf ./coverage ./node_modules"
   },
   "dependencies": {
     "chalk": "^4.0.0",

@@ -9,12 +9,12 @@
     ]
   },
   "scripts": {
-    "purge:all": "rimraf './**/lib' './**/*.tsBuildInfo' './**/coverage' './**/node_modules'",
     "lint:all": "yarn workspaces run lint",
     "test:all": "yarn workspaces run test",
     "clean:all": "yarn workspaces run clean",
     "build:all": "yarn workspaces run build",
     "verify:all": "yarn workspaces run verify",
+    "purge:all": "yarn workspaces run purge && rimraf './node_modules'",
     "tsp": "tsp"
   },
   "devDependencies": {
