@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 import { existsSync, readdirSync, lstatSync } from "fs-extra";
-import { join } from "path";
+import { join, basename, resolve } from "path";
 import * as semver from "semver";
 import * as validateNpmPackageName from "validate-npm-package-name";
 
@@ -61,10 +61,11 @@ const checkNodeVersion = () => {
 };
 
 const checkProjectName = (projectName: string) => {
-  const result = validateNpmPackageName(projectName);
+  const name = basename(projectName);
+  const result = validateNpmPackageName(name);
   if (!result.validForNewPackages) {
     throw new CliError(
-      `The project name "${projectName}" must be a valid npm package name, like "my-project".`,
+      `The project name "${name}" must be a valid npm package name, like "my-project".`,
     );
   }
 };
@@ -179,22 +180,24 @@ const printInstructions = () => {
   //
 };
 
-export const createTsProject = (args: CliOptions & { projectName: string }) => {
+export const createTsProject = (args: CliOptions & { projectName: string, yarn: boolean }) => {
   checkNodeVersion();
   checkYarnVersion();
   checkProjectName(args.projectName);
 
-  const projectPath = join(process.cwd(), args.projectName);
+  const projectPath = resolve(process.cwd(), args.projectName);
   const templatePath = join(__dirname, "..", "template");
 
   ensureProjectDir(projectPath);
   copyTemplateToProjectDir(templatePath, projectPath);
   updateRootPackageJson(
     args.dryRun ? templatePath : projectPath,
-    args.projectName,
+    basename(args.projectName),
   );
 
-  runYarnInstall(projectPath, !!args.dryRun);
+  if (args.yarn) {
+    runYarnInstall(projectPath, !!args.dryRun);
+  }
 
   printInstructions();
 };

@@ -15,12 +15,12 @@ import { createTsProject } from "./createTsProject";
 const handler = commandHandler(createTsProject);
 
 (yargs as yargs.Argv<CliOptions & { projectName: string }>)
-  .usage("Usage: $0 <project-name>")
+  .usage("Usage: $0 <project-name> [--no-yarn]")
 
   .middleware((argv) => {
     setVerbose(!!argv.verbose);
     if (argv.verbose) {
-      log.success("Verbose logging enabled.");
+      log.verbose("Verbose logging enabled.");
     }
 
     configureFiles({ dryRun: !!argv.dryRun });
@@ -35,10 +35,20 @@ const handler = commandHandler(createTsProject);
     command: "* <project-name>",
     describe: "Create a new TypeScript project.",
     builder: (yargs) =>
-      yargs.positional("project-name", {
-        desc: "Name of the project. A folder will be created with this name.",
-        type: "string",
-      } as any),
+      yargs
+        .positional("project-name", {
+          desc:
+            "Name of the project. A folder will be created with this name. " +
+            "May also be an absolute or relative path (relative to the cwd).",
+          type: "string",
+        })
+        .options({
+          yarn: {
+            boolean: true,
+            describe: "Run yarn after the command completes. Disable with --no-yarn.",
+            default: true,
+          },
+        }),
     handler,
   })
 
