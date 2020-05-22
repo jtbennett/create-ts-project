@@ -11,13 +11,13 @@ module.exports = {
     // Core eslint recommended rules.
     "eslint:recommended",
 
-    // Override those with Typescript versions, where necessary.
+    // Override those with TypeScript versions, where necessary.
     "plugin:@typescript-eslint/eslint-recommended",
 
-    // Core Typescript recommended rules - syntax only.
+    // Core TypeScript recommended rules - syntax only.
     "plugin:@typescript-eslint/recommended",
 
-    // Core Typescript recommended rules - full type checking.
+    // Core TypeScript recommended rules - full type checking.
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
 
     // Disable formatting rules that prettier will handle.

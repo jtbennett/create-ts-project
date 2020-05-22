@@ -4,10 +4,11 @@
   "keywords": [
     "typescript",
     "monorepo",
+    "generator",
     "create",
     "project"
   ],
-  "description": "Create Typescript monorepos with project references, eslint, prettier, and jest configured and ready for development.",
+  "description": "Create TypeScript monorepos with project references, eslint, prettier, and jest configured and ready for development.",
   "author": "John Bennett <john@jtbennett.com>",
   "repository": {
     "type": "git",

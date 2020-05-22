@@ -4,10 +4,11 @@
   "keywords": [
     "typescript",
     "monorepo",
+    "generator",
     "create",
     "project"
   ],
-  "description": "Scripts for Create Typescript Project.",
+  "description": "Scripts for Create TypeScript Project.",
   "author": "John Bennett <john@jtbennett.com>",
   "repository": {
     "type": "git",

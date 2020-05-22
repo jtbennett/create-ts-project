@@ -1,8 +1,8 @@
 {
   "name": "node-cli",
   "private": true,
-  "description": "",
   "version": "1.0.0",
+  "description": "",
   "keywords": [],
   "author": "",
   "license": "unlicensed",

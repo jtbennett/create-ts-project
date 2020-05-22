@@ -33,7 +33,7 @@ const handler = commandHandler(createTsProject);
 
   .command({
     command: "* <project-name>",
-    describe: "Create a new Typescript project.",
+    describe: "Create a new TypeScript project.",
     builder: (yargs) =>
       yargs.positional("project-name", {
         desc: "Name of the project. A folder will be created with this name.",

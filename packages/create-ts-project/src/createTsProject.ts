@@ -45,7 +45,7 @@ const checkYarnVersion = () => {
 
   if (!hasMinYarn || !hasMaxYarn) {
     throw new CliError(
-      `Create Typescript Project requires yarn version 1.12+ or 2.x. ` +
+      `Create TypeScript Project requires yarn version 1.12+ or 2.x. ` +
         `You are running version ${version}`,
     );
   }
@@ -54,7 +54,7 @@ const checkYarnVersion = () => {
 const checkNodeVersion = () => {
   if (!semver.satisfies(process.version, ">=12.0.0")) {
     throw new CliError(
-      `Create Typescript Project requires node version 12.0 or greater. ` +
+      `Create TypeScript Project requires node version 12.0 or greater. ` +
         `You are running version ${process.version}`,
     );
   }
