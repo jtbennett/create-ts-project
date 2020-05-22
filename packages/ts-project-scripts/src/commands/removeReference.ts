@@ -47,24 +47,24 @@ const handler = tspHandler<
 
 export const removeReference = {
   command: "unref",
-  describe: "Remove a reference/dependency from one package to another",
+  describe: "Remove a reference (dependency) from one package to another",
 
   builder: (yargs: Argv) =>
-    yargs.options({
+    yargs.usage("Usage: $0 unref --from <from> --to <to>").options({
       from: {
         alias: "f",
         describe:
-          "Name of the package that depends on the package in --to. Name must match what is in package.json.",
+          "Name of the package from which the reference (dependency) is being removed. Name must match what is in package.json.",
       },
       all: {
         alias: "a",
         describe:
-          "Remove references to the package in --to from all other packages. --from is ignored.",
+          "Remove references to the --to package from all other packages. --from is ignored.",
       },
       to: {
         alias: "t",
         describe:
-          "Name of the package is depended upon by --from. Name must match what is in package.json.",
+          "Name of the package that will no longer be referenced (depended upon). Name must match what is in package.json.",
         demand: true,
       },
       ...cliOptions,

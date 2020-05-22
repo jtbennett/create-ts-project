@@ -15,7 +15,11 @@
     "build:all": "yarn workspaces run build",
     "verify:all": "yarn workspaces run verify",
     "purge:all": "yarn workspaces run purge && rimraf './node_modules'",
-    "tsp": "tsp"
+    "ctsp:dev": "yarn workspace @jtbennett/create-ts-project dev",
+    "ctsp:test": "yarn workspace @jtbennett/create-ts-project test",
+    "tsp:dev": "yarn workspace @jtbennett/ts-project-scripts dev",
+    "tsp:test": "yarn workspace @jtbennett/ts-project-scripts test",
+    "utils:test": "yarn workspace @jtbennett/ts-project-cli-utils test"
   },
   "devDependencies": {
     "@types/jest": "24.0.18",

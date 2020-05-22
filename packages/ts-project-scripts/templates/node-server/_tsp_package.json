@@ -13,7 +13,7 @@
   "types": "lib/index.d.ts",
   "files": ["lib/**/*"],
   "scripts": {
-    "dev": "concurrently -k -n 'tsc,app' -c 'cyan,green' 'tsc --build --watch --preserveWatchOutput' 'nodemon'",
+    "dev": "tsc --build && concurrently -i -k -n 'app,tsc' -c 'green,cyan' 'nodemon' 'tsc --build --watch --preserveWatchOutput'",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",

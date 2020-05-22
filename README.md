@@ -8,6 +8,42 @@ _Coming soon: CI builds with [GitHub Actions](https://github.com/features/action
 
 If you have questions or something doesn't "just work", feel free to [submit an issue](https://github.com/jtbennett/create-ts-project/issues/new). You can find me on Twitter [@jtbennett](https://twitter.com/jtbennett)
 
+**Contents**
+
+- [Prerequisites](#prerequisites)
+
+- [Create a project](#create-a-project)
+
+- [Getting started with tsp](#getting-started-with-tsp)
+
+  - [Add a node server](#add-a-node-server)
+  - [Add a library package](#add-a-library-package)
+  - [Add a reference (dependency) between packages](#add-a-reference-dependency-between-packages)
+  - [Remove a reference (dependency) between packages](#remove-a-reference-dependency-between-packages)
+
+- [`tsp` command details](#tsp-command-details)
+
+  - [`tsp help` option](#tsp-help-option)
+  - [`tsp add` command](#tsp-add-command)
+  - [`tsp ref` command](#tsp-ref-command)
+  - [`tsp unref` command](#tsp-unref-command)
+  - [About package and directory names](#about-package-and-directory-names)
+
+- [Yarn scripts](#yarn-scripts)
+
+  - [Root-level scripts](#root-level-scripts)
+  - [Package-level scripts](#package-level-scripts)
+
+- [Philosophy](#philosophy)
+
+- [Tools included](#tools-included)
+
+- [Alternatives](#alternatives)
+
+- [Contributing](#contributing)
+
+- [License](#license)
+
 ## Prerequisites:
 
 - Install [node >=12.0](https://nodejs.org).
@@ -15,7 +51,7 @@ If you have questions or something doesn't "just work", feel free to [submit an 
 
 ## Create a project
 
-_It is not recommended to install this package. Instead, use `yarn create` or `npx` to run it._
+_It is not recommended to install the `create-ts-project` package. Instead, use `yarn create` or `npx` to run it._
 
 To create a new project, open a terminal and run:
 
@@ -47,16 +83,19 @@ my-proj
 ├── .eslintignore
 ├── .eslintrc.js
 ├── .gitignore
-└── README.md
+├── README.md
+└── yarn.lock
 ```
 
-Just standard config files for TypeScript, jest, eslint and git; a GitHub Action to build on each push to master; and some config for VS Code.
+Primarily, the files are standard config files for TypeScript, jest, eslint and git. There is also a GitHub Action to build on each push to master; and some config for VS Code.
 
 Your code will go in the `packages` directory.
 
+See [Configuration](./docs/configuration.md) for more info on how each of the tools is configured.
+
 ## Getting started with `tsp`
 
-The `ts-project-scripts` CLI, or `tsp` was installed as a devDependency when you ran the create command above.
+The `ts-project-scripts` CLI, or `tsp`, was installed as a devDependency when you ran the create command above.
 
 `tsp` is used to add packages, which is really just copying a template into the `packages` folder. More importantly, it is used to manage references (dependencies) between packages. It uses yarn workspaces and TypeScript project references, and it does all the work updating the various config files, so you don't have to.
 
@@ -82,47 +121,71 @@ Now you can use the scripts included in its `package.json` file to build, test, 
 yarn workspace my-server dev
 ```
 
-You'll see some messages from `nodemon`, and the output of the server: "Hello world" and a timestamp. (The "server" in the template is just a script that immediately exits.)
+You'll see some messages from `tsc` and `nodemon`, and the output of the server: "Hello world" and a timestamp. (The "server" in the template is just a script that immediately exits.)
 
-If you make a change to `./packages/my-server/src/index.ts` and save it, you'll see the server restart. You can now add `express`, `koa` or any other web server framework, just as you would in any other project.
+At any point while the server is running you can enter `rs` in the terminal window and the server will restart.
+
+If you make a change to `./packages/my-server/src/index.ts` or any other source file, you'll see the server restart.
 
 ### Add a library package
 
-Use the same command as above, but specify a different template. We'll use the shorthand `-t` instead of `--template`:
+You can do this in a separate terminal window, or stop the server first with `Ctrl-C`.
+
+Use the same command as above, but specify a different template. This time we'll use the shorthand `-t` instead of `--template`:
 
 ```bash
-yarn tsp add my-lib --t node-lib
+yarn tsp add my-lib -t node-lib
 ```
-
-Your package is located at: `./packages/my-lib`.
 
 That package has a default export -- a simple string. Let's import it into our server...
 
 ### Add a reference (dependency) between packages
 
+This is the conceptual equivalent of adding a dependency in `package.json`. `tsp` does that for you, as well as making changes to the nodemon and TypeScript configs.
+
 ```bash
 yarn tsp ref --from my-server --to my-lib
+```
+
+If you still have the server process running, you will have to manually restart it (due to a limitation in `ts-node`):
+
+```bash
+# Stop the server with Ctrl-C in the terminal window it is running. Then:
+yarn workspace my-server dev
 ```
 
 Now open `./packages/my-server/src/index.ts` and at the top of the file add:
 
 ```typescript
-import aValue from 'my-lib'
+import aValue from "my-lib";
 
 console.log(aValue);
 ```
 
 When you save the file, you should see in your terminal that nodemon noticed the change and restarted the server, which logged the value that you just imported.
 
-One more thing... `tsp ref` also updated the nodemon config, so that any changes in `my-lib` will also cause a restart of the server. But to pick up those change, you need to restart nodemon. Enter Ctrl-C to quit nodemon, then start it again as you did above:
+Now make a change to the string value in `./packages/my-lib/src/index.ts` and save. You should see the server restart and pick up your change.
+
+### Remove a reference (dependency) between packages
+
+This is the conceptual equivalent of removing a dependency in `package.json`. `tsp` does that for you, as well as making changes to the nodemon and TypeScript configs.
 
 ```bash
+yarn tsp unref --from my-server --to my-lib
+```
+
+If you still have the server process running, you will have to manually restart it (due to a limitation in `ts-node`):
+
+```bash
+# Stop the server with Ctrl-C in the terminal window it is running. Then:
 yarn workspace my-server dev
 ```
 
-Now make a change to the string value in `./packages/my-lib/src/index.ts` and save. You should see the server restart and pick up your change.
+You will see an error, because `./packages/my-server/src/index.ts` is trying to import from `my-lib`, which is no longer referenced. Remove the import to `my-lib` and save
 
 ## `tsp` command details
+
+- ### `tsp help` option
 
 You can get help for `tsp` in the terminal with:
 
@@ -254,79 +317,139 @@ The directory containing the package will not include any npm @scope. In the fil
 
 You can specify a custom directory name when creating a package with the `add` command using the `--dirName` argument. The other commands will locate the package without requiring the custom directory name to be specified.
 
+## Yarn scripts
+
+This document describes the `yarn` scripts available in the root `package.json` of a project generated with `create-ts-project`, as well as in the package templates used by `tsp` (`ts-project-scripts`).
+
+### Root-level scripts
+
+When you create a project with `create-ts-project`, a number of scripts are included in the root-level `package.json` file. You can run these with `yarn [script name]`. The current working directory must be inside the project, but _outside_ any package directories.
+
+Most of the root-level scripts are simply shortcuts to run the similarly named script in each package/workspace. For example, the root-level `verify:all` script runs the `verify` script in each package/workspace.
+
+_Each package directory is a yarn workspace. See [yarn config](./configuration#yarn) for more info._
+
+The root-level scripts that simply all the corresponding script in each package/workspace are:
+
+- `lint:all`
+- `test:all`
+- `clean:all`
+- `build:all`
+- `verify:all`
+- `purge:all`
+
+For details on what each script actually does, see [Package-level scripts](#package-level-scripts) below.
+
+_Note: **The corresponding scripts must exist in all packages** or yarn will exit with an error. If you don't want a package-level script to do anything, you can make its value `echo`._
+
+In addition, there is one root-level scripts that doesn't have an equivalent at the package level:
+
+- **`tsp`**
+
+  A shortcut to run `tsp`. This means in the project root, you can run `yarn tsp <command> [options]` instead of `./node_modules/.bin/tsp <command> [options]`.
+
+### Package-level scripts
+
+All templates include the same set of scripts.
+
+The `dev` and `build` scripts are different in each package template, because the appropriate action depends on the type of package.
+
+- **`dev`**
+
+  - **node-server**
+
+    Uses `concurrently` to build the server in watch mode and run it in `ts-node`.
+
+    `nodemon` restarts the `ts-node` server on each file change. See the `nodemonConfig` property of `package.json` for the exact config. (Actually runs `concurrently` to work around a limitation of `ts-node`. See [nodemon config] for details.)
+
+    _The build in watch mode is required because `ts-node` doesn't yet understand TypeScript project references._
+
+  - **node-cli**
+
+    Builds and runs the CLI entry point script using `ts-node`. Any parameters passed to dev are forwarded to the CLI.
+
+    ```bash
+    # This will pass 'foo --bar baz' to your CLI entry point.
+    yarn dev foo --bar baz
+    ```
+
+    _The initial build is required because `ts-node` doesn't yet understand TypeScript project references._
+
+  - **node-lib**
+
+    Builds the library in watch mode, so it rebuilds on each file change.
+
+    _Note: Libraries are automatically built by the projects that reference them and rebuilt when files change (in watch mode). The only case where you would typically run the `dev` script for a library is for a standalone package that you intend to publish to npm._
+
+- **`build`**
+
+  - **node-server** - Builds the package.
+
+  - **node-cli** - Builds the package and sets the entry point file to be executable (with `chmod`).
+
+  - **node-lib** - Builds the package.
+
+The remaining scripts are the same in all package templates:
+
+- **`lint`**
+
+  Lints the package with eslint. Warnings will be displayed, but do not cause linting to fail.
+
+  _Because we use eslint rules that perform TypeScript type checks, linting a package that references other packages requires that the packages be built first. See [eslint config](./confiuguration.md#eslint) for more info._
+
+- **`test`**
+
+  Runs all tests in the package with jest. Add the `--coverage` option to generate a test coverage report.
+
+- **`clean`**
+
+  Deletes all build outputs for the package. See [TypeScript config](./configuration#typescript) for more info.
+
+- **`verify`**
+
+  Runs test, clean, build, and lint scripts, as described above. The only difference is that `verify` tells eslint to fail if there are any warnings.
+
+- **`purge`**
+
+  Runs the `clean` script to delete build outputs, and also deletes the package's `node_modules` and `coverage` folders.
+
 ## Philosophy
 
-- It just works. All the tools should work well together out of the box, without needing additional configuration.
+- **It just works.** All the tools should work well together out of the box, without needing additional configuration.
 
-- No magic. Everything is done with standard configuration files for typescript, node, eslint, jest, prettier, nodemon, etc. Customize them as you like, or create your own templates.
+- **No magic.** Everything is done with standard configuration files for typescript, node, eslint, jest, prettier, nodemon, etc. Customize them as you like, or create your own templates.
 
-- Be practical. There are a few compromises in this setup. For example, an extra build has to happen before running the node-server template in watch mode, because `ts-node` doesn't yet understand project references. Those instances will be optimized when the tools make it possible. In the meantime, the compromises are small and probably won't be noticeable.
+- **Be practical.** There are a few compromises in this setup. For example, an extra build has to happen before running the node-server template in watch mode, because `ts-node` doesn't yet understand project references. Those compromises will be remove if and when the tools make it possible. In the meantime, they're small and probably won't be noticeable.
 
-## What's included
+## Tools included
 
-Create TypeScript Project generates a monorepo for TypeScript-based projects, including node-based apps, front-tend apps created with create-react-app _(more info coming soon!)_, or packages intended for publishing on npm. The goal is to have a nice dev/build/deploy/publish experience without spending any time setting up the tools.
-
-Although it is structured as a monorepo, Create TypeScript Project may be useful even if you never publish packages. I tend to organize code in multiple packages even when I'm only consuming those packages from a single application and none of it is ever published to npm.
-
-### Tools used
+See [Configuration](./docs/configuration.md) for more info on how each of the tools is configured.
 
 For development:
 
-- typescript - language, uses project references.
+- TypeScript - language, uses project references.
 - jest - testing.
 - eslint - linting.
 - yarn v1.x - package management and running scripts.
-- ts-node - running node-based apps written in typescript without a separate transpile step.
-- prettier - code formatting.
-- Docker - running dev-time dependencies like databases.
-- VS Code - code editor.
+- ts-node - running node-based apps written in typescript.
+- prettier - formatting code.
+- Docker - running dev-time dependencies like databases. _Coming soon!_
+- VS Code - code editor. (Not required, but you may need to configure other editors for linting, formatting, etc.)
 
 For continuous integration (CI): _Coming soon!_
 
 - github actions - running continuous integration (CI) and deploying on each commit.
 - github packages - hosting docker images
-- Docker - output of build process is a Docker image.
+- Docker - output of build process for applications is a Docker image.
 
-The more of those tools that you use, the more useful this template may be, but most are easily removed or replaced. That said, it probably makes little sense to use this template if you aren't primarily using TypeScript.
+The more of those tools that you use, the more useful CTSP may be, but most can be removed or replaced if you want to go through the effort of configuring an alternative. That said, it probably makes little sense to use this template if you aren't primarily using TypeScript.
 
 ## Alternatives
 
 A million boilerplate repos and create-\* scripts are out there. You may find others more to your liking. This one is set up the way I like to work. If it's useful for you, great!
 
-## Contributing
-
-This repo is itself an instance of the same project structure generated by Create TypeScript Project, so the requirements are the same: `node >=12.0` and `yarn >=1.12, <2.0`
-
-**One-time setup:**
-
-```bash
-# Fork the repo and clone your fork.
-git clone https://github.com/yourgithubname/create-ts-project.git
-cd create-ts-project
-yarn
-```
-
-To run commands in local development:
-
-```bash
-yarn workspace create-ts-project dev [arguments]
-yarn workspace ts-project-scripts dev [arguments]
-```
-
-To run tests: (There aren't any yet!)
-
-```bash
-yarn workspace ts-project-cli-utils test --watch
-yarn workspace create-ts-project test --watch
-yarn workspace ts-project-scripts test --watch
-```
-
-Before creating a pull request, make sure this completes successfully:
-
-```bash
-yarn verify:all
-```
-
 ## License
 
 Create TypeScript Project is licensed under the [MIT license](./LICENSE).
+
+[License notices](./docs/licenses.md) for third-party software used in this project.

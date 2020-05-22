@@ -99,17 +99,20 @@ const handler = commandHandler<
 
 export const releasePackages = {
   command: "release <pkg-names..>",
-  describe: "Publish the packages to npm with the specified version.",
+  describe:
+    "Publish the packages to npm with the specified version. This command is typically used from a CI server.",
 
   builder: (yargs: Argv) =>
     yargs
+      .usage("Usage: $0 release --ver <version> [options] <pkg-names..>")
       .positional("pkg-names", {
-        desc: "Name of the packages to publish",
+        desc:
+          "Names of the packages to publish. Name must match what is in package.json.",
         type: "string",
       })
       .options({
         "set-version": {
-          alias: ["set", "ver"],
+          alias: ["ver"],
           string: true,
           default: "",
           describe: "Version to assign to the packages when publishing.",

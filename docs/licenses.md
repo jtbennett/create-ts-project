@@ -1,4 +1,6 @@
-# Licenses - @jtbennett/create-ts-project
+# Licenses
+
+Below are license notices for third-party software used in this project.
 
 ## Facebook
 

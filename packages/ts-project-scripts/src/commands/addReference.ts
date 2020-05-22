@@ -34,20 +34,20 @@ const handler = tspHandler<
 
 export const addReference = {
   command: "ref",
-  describe: "Add a reference/dependency from one package to another",
+  describe: "Add a reference (dependency) from one package to another",
 
   builder: (yargs: Argv) =>
-    yargs.options({
+    yargs.usage("Usage: $0 ref --from <from> --to <to>").options({
       from: {
         alias: "f",
         describe:
-          "Name of the package that will depend on the package in --to. Name must match what is in package.json.",
+          "Name of the package that will reference (depend on) the --to package. Name must match what is in package.json.",
         demand: true,
       },
       to: {
         alias: "t",
         describe:
-          "Name of the package that will be depended upon by --from. Name must match what is in package.json.",
+          "Name of the package that will be referenced (depended upon) by the --from package. Name must match what is in package.json.",
         demand: true,
       },
       ...cliOptions,

@@ -16,6 +16,7 @@ import { releasePackages } from "./commands/releasePackages";
 
 (yargs as yargs.Argv<CliOptions>)
   .version(false)
+  .scriptName("tsp")
   .usage("Usage: $0 <command> [options]")
 
   .middleware((argv) => {

@@ -13,8 +13,5 @@ module.exports = {
   setupFiles: ["<rootDir>/src/jest/createMocks.ts"],
   setupFilesAfterEnv: ["<rootDir>/src/jest/addMatchers.ts"],
   testMatch: ["<rootDir>/src/**/*.test.ts"],
-  moduleNameMapper: {
-    "^@jtbennett/([^/]*)$": "<rootDir>/../$1/src",
-    "^@jtbennett/([^/]*)/(.*)$": "<rootDir>/../$1/src/$2",
-  },
+  moduleNameMapper: {},
 };

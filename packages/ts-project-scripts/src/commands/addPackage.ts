@@ -26,8 +26,10 @@ export const addPackage = {
 
   builder: (yargs: Argv) =>
     yargs
+      .usage("Usage: $0 add <pkg-name> -t <template>")
+
       .positional("pkg-name", {
-        desc: "Name of the package to add",
+        desc: "Name of the package to add. Name will be written to package.json.",
         type: "string",
       })
       .options({

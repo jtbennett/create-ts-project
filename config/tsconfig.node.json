@@ -1,5 +1,5 @@
 // This file contains shared TypeScript compilerOptions for packages that run in node.
-// The tsconfig.json file in each sub-folder of "packages/" extends this file.
+// The tsconfig.json file in each sub-folder of "packages" extends this file.
 
 // Don't try to include paths in this file, as some will be
 // relative to this file and some relative to the package-level tsconfig.json.
