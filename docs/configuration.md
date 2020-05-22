@@ -6,15 +6,6 @@ All paths are relative to the project/repo root, unless stated otherwise.
 
 _Remember: There is no magic. `tsp` only makes changes to standard `tsconfig.json` and `package.json` files._
 
-## How do I change...?
-
-`./config/tsconfig.node.json`
-`./config/jest.config.js`
-`./eslintrc.js`
-`./package.json` in the `prettier` property.
-format on save: ./.vscode/settings.json
-/lib to /dist or /build
-
 ## VS Code
 
 The `./.vscode/settings.json` file tells VS Code to:
@@ -91,7 +82,7 @@ On the other hand, the `package.json` in each package template anticipates that 
 
 _(Standard json cannot include comments. The descriptive comments below must be removed if you copy this into an actual `package.json` file.)_
 
-```json
+```js
 {
   // To prevent unintended publishing to npm. Must be removed to publish.
   "private": true,

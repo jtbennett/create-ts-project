@@ -10,11 +10,19 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   verbose: true,
+
+  // These files run before anything else.
+  // Typically used to create mocks used in all test files.
   setupFiles: ["<rootDir>/src/jest/createMocks.ts"],
+
+  // These files run after the Jest environment is ready.
+  // If you have custom matchers or other global setup, do it here.
   setupFilesAfterEnv: ["<rootDir>/src/jest/addMatchers.ts"],
+
+  // Test files must match this pattern.
   testMatch: ["<rootDir>/src/**/*.test.ts"],
-  moduleNameMapper: {
-    "^@jtbennett/([^/]*)$": "<rootDir>/../$1/src",
-    "^@jtbennett/([^/]*)/(.*)$": "<rootDir>/../$1/src/$2",
-  },
+
+  // Jest needs help finding modules in referenced packages.
+  // TODO: "tsp ref" and "tsp unref" manage these values for you.
+  moduleNameMapper: {},
 };
