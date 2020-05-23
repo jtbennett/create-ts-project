@@ -27,7 +27,7 @@ yarn tsp add my-server --template node-server
 yarn tsp add my-lib -t node-lib
 
 # Add a reference from the server app to the library package:
-yarn tsp ref --from my-server --to my-app
+yarn tsp ref --from my-server --to my-lib
 
 # Run the server in dev mode:
 yarn workspace my-server dev
@@ -514,6 +514,14 @@ The remaining scripts are the same in all package templates:
 - **`purge`**
 
   Runs the `clean` script to delete build outputs, and also deletes the package's `node_modules` and `coverage` folders.
+
+## VS Code tasks
+
+All of the root-level yarn scripts are also available as VS Code tasks. When you choose Run Tasks, you will see them listed.
+
+In addition, the `tsp add`, `tsp ref` and `tsp unref` commands are also available as tasks. These will prompt you to input package names and provides a drop-down for selecting a template for `tsp add`.
+
+I recommend that you also create a task to run each server in your repo in dev mode. A sample is included in the `./.vscode/tasks.json` file. Uncomment it and simply replace `my-server` with the directory name of your server package.
 
 ## Philosophy
 

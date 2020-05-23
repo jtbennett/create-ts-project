@@ -1,0 +1,77 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "problemMatcher": [],
+  "type": "shell",
+  "options": { "cwd": "${workspaceRoot}" },
+  "inputs": [
+    {
+      "id": "packageName",
+      "type": "promptString",
+      "description": "What is the name of the package to create?"
+    },
+    {
+      "id": "template",
+      "type": "pickString",
+      "description": "Which template should the package be created with?",
+      "options": ["node-lib", "node-cli", "node-server"],
+      "default": "node-lib"
+    },
+    {
+      "id": "refFrom",
+      "type": "promptString",
+      "description": "Which package are you creating the reference FROM?"
+    },
+    {
+      "id": "refTo",
+      "type": "promptString",
+      "description": "Which package are you creating the reference TO?"
+    },
+    {
+      "id": "unrefFrom",
+      "type": "promptString",
+      "description": "Which package are you removing the reference FROM?"
+    },
+    {
+      "id": "unrefTo",
+      "type": "promptString",
+      "description": "Which package are you removing the reference TO?"
+    }
+  ],
+  "tasks": [
+    // Sample task to run a server in dev mode. For a package named "my-server",
+    // created from the node-server template:
+    // {
+    //   "label": "Run my-server for dev",
+    //   "command": "yarn workspace my-server dev"
+    // },
+    {
+      "label": "Add a new package",
+      "command": "yarn tsp:dev add ${input:packageName} --template ${input:template}"
+    },
+    {
+      "label": "Add a reference from one package to another",
+      "command": "yarn tsp:dev ref --from ${input:refFrom} --to ${input:refTo}"
+    },
+    {
+      "label": "Remove a reference from one package to another",
+      "command": "yarn tsp:dev unref --from ${input:unrefFrom} --to ${input:unrefTo}"
+    },
+    { "label": "List all packages", "command": "yarn tsp list" },
+    {
+      "group": { "kind": "build", "isDefault": true },
+      "label": "Verify all packages",
+      "command": "yarn verify:all"
+    },
+    {
+      "group": { "kind": "test", "isDefault": true },
+      "label": "Test all packages",
+      "command": "yarn test:all"
+    },
+    { "label": "Build all packages", "command": "yarn build:all" },
+    { "label": "Lint all packages", "command": "yarn lint:all" },
+    { "label": "Clean all packages", "command": "yarn clean:all" },
+    { "label": "Purge all packages", "command": "yarn purge:all" }
+  ]
+}
