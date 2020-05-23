@@ -29,6 +29,9 @@ If your team would benefit from common use of other VS Code extensions, you may 
 - DotENV (mikestead.dotenv)
 - GitHub Pull Requests and Issues (github.vscode-pull-request-github)
 - GitLens (eamodio.gitlens)
+- JavaScript (ES6) code snippets (xabikos.javascriptsnippets)
+- Jest Test Explorer (kavod-io.vscode-jest-test-adapter)
+  - Requires: Text Explorer UI (hbenl.vscode-test-explorer)
 - Live Share (ms-vsliveshare.vsliveshare)
 - Peacock (johnpapa.vscode-peacock)
 
