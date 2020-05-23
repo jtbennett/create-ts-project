@@ -76,7 +76,7 @@ yarn verify:all
 
 ## Why?
 
-**A monorepo...**
+**_A monorepo..._**
 
 A lot of my work is building APIs and web apps, often with NodeJS and React and in TypeScript. It's common to have both the NodeJS web server and the React client app in the same project.
 
@@ -84,15 +84,15 @@ I also tend to split larger apps into separate packages -- both to organize the 
 
 As a result, these projects are usually monorepos -- multiple packages/apps in the same repo.
 
-**...plus a lot of interdependent tools...**
+**_...plus a lot of interdependent tools..._**
 
 A typical project involves configuring TypeScript, ts-node, jest, eslint, prettier, nodemon, Docker, VS Code, a CI process in GitHub Actions or CircleCI or TravisCI or Jenkins, deployments to Heroku or AWS or Azure or Google Cloud, and sometimes publishing to npm.
 
-**...involves a lot of configuration effort...**
+**_...involves a lot of configuration effort..._**
 
 Separately, each of those tools is straightforward to use. Getting them all working together in harmony takes effort. Doing it in a monorepo is more effort. And keeping them working consistently for all members of a team -- even more effort.
 
-**...and ongoing hassle...**
+**_...and ongoing hassle..._**
 
 Adding a dependency between two packages in a monorepo sounds simple: run the yarn or npm or lerna command and you're done.
 
@@ -108,7 +108,7 @@ But are you?
 
 - When built for deployment, can the transpiled .js files be resolved by node?
 
-**...which keeps you from focusing on the actual product.**
+**_...which keeps you from focusing on the actual product._**
 
 I'd like everyone on the team to have all that "just work", so we can focus on the actual thing we're trying to build. That's the goal for Create Typescript Project.
 
