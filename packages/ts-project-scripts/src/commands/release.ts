@@ -63,7 +63,9 @@ const handler = commandHandler<
     originalConfig = setNpmRegistryCredentials();
 
     args.pkgNames.forEach((pkgName) => {
-      const pkg = all.find((pkg) => pkg.packageJson!.name === pkgName);
+      const pkg = all.find(
+        (pkg) => pkg.packageJson && pkg.packageJson.name === pkgName,
+      );
 
       if (!pkg) {
         throw new CliError(
@@ -97,7 +99,7 @@ const handler = commandHandler<
   }
 });
 
-export const releasePackages = {
+export const release = {
   command: "release <pkg-names..>",
   describe:
     "Publish the packages to npm with the specified version. This command is typically used from a CI server.",

@@ -20,7 +20,7 @@ const handler = tspHandler<
   }).create();
 });
 
-export const addPackage = {
+export const add = {
   command: "add <pkg-name>",
   describe: "Add a package based on a template",
 

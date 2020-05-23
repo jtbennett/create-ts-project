@@ -13,8 +13,12 @@ const handler = tspHandler<
   }
 >((args) => {
   const all = Package.loadAll();
-  const fromPkg = all.find((pkg) => pkg.packageJson!.name === args.from);
-  const toPkg = all.find((pkg) => pkg.packageJson!.name === args.to);
+  const fromPkg = all.find(
+    (pkg) => pkg.packageJson && pkg.packageJson.name === args.from,
+  );
+  const toPkg = all.find(
+    (pkg) => pkg.packageJson && pkg.packageJson.name === args.to,
+  );
 
   const pkgNotFoundError = (name: string) =>
     new CliError(
@@ -32,7 +36,7 @@ const handler = tspHandler<
   fromPkg.addReferenceTo(toPkg);
 });
 
-export const addReference = {
+export const ref = {
   command: "ref",
   describe: "Add a reference (dependency) from one package to another",
 

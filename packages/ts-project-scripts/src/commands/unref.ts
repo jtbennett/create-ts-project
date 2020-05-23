@@ -21,10 +21,14 @@ const handler = tspHandler<
   const all = Package.loadAll();
 
   const fromPackages = args.all
-    ? all.filter((pkg) => pkg.packageJson!.name !== args.to)
-    : all.filter((pkg) => pkg.packageJson!.name === args.from);
+    ? all.filter((pkg) => pkg.packageJson && pkg.packageJson.name !== args.to)
+    : all.filter(
+        (pkg) => pkg.packageJson && pkg.packageJson.name === args.from,
+      );
 
-  const toPackage = all.find((pkg) => pkg.packageJson!.name === args.to);
+  const toPackage = all.find(
+    (pkg) => pkg.packageJson && pkg.packageJson.name === args.to,
+  );
 
   if (args.from !== "*" && fromPackages.length === 0) {
     throw pkgNotFoundError(args.from);
@@ -45,7 +49,7 @@ const handler = tspHandler<
   }
 });
 
-export const removeReference = {
+export const unref = {
   command: "unref",
   describe: "Remove a reference (dependency) from one package to another",
 

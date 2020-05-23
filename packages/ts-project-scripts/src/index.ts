@@ -9,10 +9,11 @@ import {
   setVerbose,
 } from "@jtbennett/ts-project-cli-utils";
 
-import { addPackage } from "./commands/addPackage";
-import { addReference } from "./commands/addReference";
-import { removeReference } from "./commands/removeReference";
-import { releasePackages } from "./commands/releasePackages";
+import { list } from "./commands/list";
+import { add } from "./commands/add";
+import { ref } from "./commands/ref";
+import { unref } from "./commands/unref";
+import { release } from "./commands/release";
 
 (yargs as yargs.Argv<CliOptions>)
   .version(false)
@@ -33,11 +34,12 @@ import { releasePackages } from "./commands/releasePackages";
     }
   })
 
-  .command(addPackage as any)
-  .command(addReference as any)
-  .command(removeReference as any)
+  .command(list as any)
+  .command(add as any)
+  .command(ref as any)
+  .command(unref as any)
 
-  .command(releasePackages as any)
+  .command(release as any)
 
   .demandCommand(1, "You must enter a command.")
   .help()
