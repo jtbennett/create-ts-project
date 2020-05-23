@@ -23,6 +23,7 @@
   },
   "nodemonConfig": {
     "exec": "ts-node ./src/index.ts --files",
+    "delay": "1000",
     "ext": "ts,json",
     "ignore": ["./src/jest", "./src/**/*.test.ts", "./src/**/__mocks__"],
     "watch": [

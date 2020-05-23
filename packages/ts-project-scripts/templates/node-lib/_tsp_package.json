@@ -13,7 +13,7 @@
   "types": "lib/index.d.ts",
   "files": ["lib/**/*"],
   "scripts": {
-    "dev": "echo 'This is a library package. Nothing to run. Building in watch mode...' && tsc --build --watch --preserveWatchOutput",
+    "dev": "tsc --build --watch --preserveWatchOutput",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",

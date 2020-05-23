@@ -30,10 +30,8 @@
   },
   "devDependencies": {
     "@types/node": "^12.7.8",
-    "concurrently": "^5.2.0",
     "eslint": "^6.8.0",
     "jest": "24.9.0",
-    "nodemon": "^2.0.4",
     "rimraf": "^3.0.0",
     "ts-node": "^8.10.1",
     "typescript": "~3.8.3"
