@@ -23,14 +23,14 @@ Some examples:
 # Add a server app:
 yarn tsp add my-server --template node-server
 
+# Run the server in dev mode:
+yarn workspace my-server dev
+
 # Add a library package (-t is the same as --template):
 yarn tsp add my-lib -t node-lib
 
 # Add a reference from the server app to the library package:
 yarn tsp ref --from my-server --to my-lib
-
-# Run the server in dev mode:
-yarn workspace my-server dev
 ```
 
 Open `./packages/my-server/src/index.ts` and add:
@@ -44,7 +44,7 @@ console.log(aValue);
 Other useful scripts (see [Yarn scripts](#yarn-scripts) for a full list):
 
 ```bash
-# Run tests for just the library:
+# Run tests for just the my-lib package:
 yarn workspace my-lib test
 
 # Lint, test and build all packages:
@@ -206,11 +206,18 @@ You'll see some messages from `tsc` and `nodemon`, and the output of the server:
 
 If you make a change to `./packages/my-server/src/index.ts`, you'll see the server restart.
 
+Alternatively, you can do this to run scripts inside a single package:
+
+```bash
+cd ./packages/my-server
+yarn dev
+```
+
+The advantage of the `yarn workspace <package> <script>` format is that you don't have to change directories. I find that the longer command is not a hassle, but it's a personal preference.
+
 ### Add a library package
 
-You can do this in a separate terminal window, or stop the server first with `Ctrl-C`.
-
-Use the same command as above, but specify a different template. This time we'll use the shorthand `-t` instead of `--template`:
+To create another package, use the same command as above, but specify a different template. This time we'll use the shorthand `-t` instead of `--template`. You can leave the server running and do this in a separate terminal window:
 
 ```bash
 yarn tsp add my-lib -t node-lib
@@ -226,13 +233,6 @@ This is the conceptual equivalent of adding a dependency in `package.json`. `tsp
 yarn tsp ref --from my-server --to my-lib
 ```
 
-If you still have the server process running, you will have to manually restart it now (due to a limitation in `ts-node`):
-
-```bash
-# Stop the server with Ctrl-C in the terminal where it is running. Then:
-yarn workspace my-server dev
-```
-
 Now open `./packages/my-server/src/index.ts` and at the top of the file add:
 
 ```typescript
@@ -240,9 +240,11 @@ import aValue from "my-lib";
 console.log(aValue);
 ```
 
-When you save the file, you should see in your terminal that nodemon noticed the change and restarted the server, which logged the value that you just imported.
+When you save the file, you should see in your terminal that nodemon noticed the change and restarted the server. You should see in the terminal the output of the `console.log()`.
 
 Now make a change to the string value in `./packages/my-lib/src/index.ts` -- in the referenced package -- and save. You should see the server restart and pick up your change.
+
+The server automatically picks up new references as well as any changes made in those referenced packages.
 
 ### Remove a reference (dependency) between packages
 
@@ -252,14 +254,7 @@ This is the conceptual equivalent of removing a dependency in `package.json`. `t
 yarn tsp unref --from my-server --to my-lib
 ```
 
-If you still have the server process running, you will have to manually restart it now (due to a limitation in `ts-node`):
-
-```bash
-# Stop the server with Ctrl-C in the terminal where it is running. Then:
-yarn workspace my-server dev
-```
-
-You will see an error, because `./packages/my-server/src/index.ts` is trying to import from `my-lib`, which is no longer referenced. Remove the code you added and save. The server should restart and run successfully.
+You will see an error, because `./packages/my-server/src/index.ts` still contains an import from `my-lib`, which is no longer referenced. Remove the code you added and save. The server should restart and run successfully.
 
 ## `tsp` command details
 

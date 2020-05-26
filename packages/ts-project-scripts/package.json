@@ -36,7 +36,7 @@
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
-    "build": "tsc --build && chmod +x ./lib/index.js",
+    "build": "tsc --build ./tsconfig.build.json && chmod +x ./lib/index.js",
     "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
     "purge": "yarn clean && rimraf ./coverage ./node_modules"
   },
@@ -64,6 +64,9 @@
     "testEnvironment": "node",
     "testMatch": [
       "<rootDir>/src/**/*.test.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "@jtbennett/ts-project-cli-utils": "<rootDir>/../ts-project-cli-utils/src"
+    }
   }
 }

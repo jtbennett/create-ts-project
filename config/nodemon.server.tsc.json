@@ -1,5 +1,5 @@
 {
-  "exec": "tsc --build --watch --preserveWatchOutput",
+  "exec": "tsc --build ./tsconfig.build.json --watch --preserveWatchOutput",
   "ext": "json",
-  "watch": ["./tsconfig.json"]
+  "watch": ["./tsconfig.build.json"]
 }

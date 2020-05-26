@@ -22,11 +22,11 @@
   "main": "./lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "dev": "echo 'This is a library package. Nothing to run. Building in watch mode...' && tsc --build --watch --preserveWatchOutput",
+    "dev": "echo 'This is a library package. Nothing to run. Building in watch mode...' && yarn build --watch --preserveWatchOutput",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
-    "build": "tsc --build",
+    "build": "tsc --build ./tsconfig.build.json",
     "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
     "purge": "yarn clean && rimraf ./coverage ./node_modules"
   },

@@ -1,0 +1,22 @@
+{
+  "references": [
+    {
+      "path": "../ts-project-cli-utils/tsconfig.build.json"
+    }
+  ],
+  "extends": "../../config/tsconfig.node.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "tsBuildInfoFile": "./tsconfig.tsBuildInfo"
+  },
+  "include": ["src/**/*.ts", "src/**/*.json"],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "templates",
+    "src/jest",
+    "src/**/*.test.ts",
+    "src/**/__mocks__"
+  ]
+}

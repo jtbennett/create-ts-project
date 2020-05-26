@@ -13,23 +13,23 @@
   "types": "lib/index.d.ts",
   "files": ["lib/**/*"],
   "scripts": {
-    "dev": "tsc --build && concurrently -i -k -n 'app,tsc' -c 'green,cyan' 'nodemon' 'nodemon --config ../../config/nodemon.server.tsc.json'",
+    "dev": "yarn build && concurrently -i -k -n 'app,tsc' -c 'green,cyan' 'nodemon' 'nodemon --config ../../config/nodemon.server.tsc.json'",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
-    "build": "tsc --build",
+    "build": "tsc --build ./tsconfig.build.json",
     "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
     "purge": "yarn clean && rimraf ./coverage ./node_modules"
   },
   "nodemonConfig": {
-    "exec": "ts-node ./src/index.ts --files",
+    "exec": "ts-node ./src/index.ts",
     "delay": "1000",
     "ext": "ts,json",
     "ignore": ["./src/jest", "./src/**/*.test.ts", "./src/**/__mocks__"],
     "watch": [
       ".env",
       "./src",
-      "./tsconfig.json",
+      "./tsconfig.build.json",
       "../../config/tsconfig.node.json"
     ]
   },

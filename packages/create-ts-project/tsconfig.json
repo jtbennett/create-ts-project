@@ -1,26 +1,4 @@
 {
-  "references": [
-    {
-      "path": "../ts-project-cli-utils"
-    }
-  ],
-  "extends": "../../config/tsconfig.node.json",
-  "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./lib",
-    "composite": true,
-    "tsBuildInfoFile": "./tsconfig.tsBuildInfo",
-    "baseUrl": ".",
-    "paths": {
-      "@jtbennett/ts-project-cli-utils": ["../ts-project-cli-utils/src"]
-    }
-  },
-  "include": ["src/**/*.ts", "src/**/*.json"],
-  "exclude": [
-    "lib",
-    "template",
-    "src/jest",
-    "src/**/*.test.ts",
-    "src/**/__mocks__"
-  ]
+  "extends": "./tsconfig.build.json",
+  "exclude": ["node_modules", "lib", "templates"]
 }

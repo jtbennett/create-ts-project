@@ -8,6 +8,11 @@ import {
 } from "@jtbennett/ts-project-cli-utils";
 import { getPaths, Paths } from "./paths";
 
+const tsconfigBuildFile = "tsconfig.build.json";
+const packageFile = "package.json";
+const srcDir = "src";
+const libDir = "lib";
+
 export class Package {
   paths: Paths;
   files: Files;
@@ -48,12 +53,13 @@ export class Package {
   static load(path: string) {
     const files = getFiles();
 
-    const tsconfig = files.readJsonSync<Tsconfig>(join(path, "tsconfig.json"));
+    const tsconfig = files.readJsonSync<Tsconfig>(
+      join(path, tsconfigBuildFile),
+    );
     tsconfig.references = tsconfig.references || [];
-    tsconfig.compilerOptions.paths = tsconfig.compilerOptions.paths || {};
 
     const packageJson = files.readJsonSync<PackageJson>(
-      join(path, "package.json"),
+      join(path, packageFile),
     );
     packageJson.dependencies = packageJson.dependencies || {};
 
@@ -69,7 +75,7 @@ export class Package {
     this.files.copySync(templatePath, this.path);
 
     const path = this.files.dryRun ? templatePath : this.path;
-    const name = this.files.dryRun ? "_tsp_package.json" : "package.json";
+    const name = this.files.dryRun ? "_tsp_" + packageFile : packageFile;
 
     const json = this.files.readJsonSync(join(path, name));
     json.name = this.name;
@@ -80,27 +86,20 @@ export class Package {
   }
 
   setVersion(version: string) {
-    const packageJsonPath = join(this.path, "package.json");
+    const packageJsonPath = join(this.path, packageFile);
     const json = this.files.readJsonSync(packageJsonPath);
     json.version = version;
     this.files.writeJsonSync(packageJsonPath, json);
   }
 
   addReferenceTo(dependency: Package) {
-    const {
-      references,
-      compilerOptions: { paths },
-    } = this.tsconfig!;
+    const { references } = this.tsconfig!;
 
     const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dir}`),
+      ref.path.endsWith(`/${dependency.dir}/${tsconfigBuildFile}`),
     );
     if (refIndex < 0) {
-      references.push({ path: `../${dependency.dir}` });
-    }
-
-    if (!paths[dependency.name]) {
-      paths[dependency.name] = [`../${dependency.dir}/src`];
+      references.push({ path: `../${dependency.dir}/${tsconfigBuildFile}` });
     }
 
     const { dependencies } = this.packageJson!;
@@ -114,45 +113,37 @@ export class Package {
       if (!jest.moduleNameMapper[dependency.name]) {
         jest.moduleNameMapper[
           dependency.name
-        ] = `<rootDir>/../${dependency.dir}/src`;
+        ] = `<rootDir>/../${dependency.dir}/${srcDir}`;
       }
     }
 
     const watch = this.packageJson?.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
-        path.endsWith(`/${dependency.dir}/lib`),
+        path.endsWith(`/${dependency.dir}/${libDir}`),
       );
       if (index < 0) {
-        watch.push(`../${dependency.name}/lib`);
+        watch.push(`../${dependency.name}/${libDir}`);
       }
     }
 
-    this.files.writeJsonSync(join(this.path, "tsconfig.json"), this.tsconfig!);
     this.files.writeJsonSync(
-      join(this.path, "package.json"),
-      this.packageJson!,
+      join(this.path, tsconfigBuildFile),
+      this.tsconfig!,
     );
+    this.files.writeJsonSync(join(this.path, packageFile), this.packageJson!);
   }
 
   removeReferenceTo(dependency: Package) {
     let tsconfigChanged = false;
     let packageJsonChanged = false;
 
-    const {
-      references,
-      compilerOptions: { paths },
-    } = this.tsconfig!;
+    const { references } = this.tsconfig!;
     const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dir}`),
+      ref.path.endsWith(`/${dependency.dir}/${tsconfigBuildFile}`),
     );
     if (refIndex >= 0) {
       references.splice(refIndex, 1);
-      tsconfigChanged = true;
-    }
-
-    if (paths[dependency.name]) {
-      delete paths[dependency.name];
       tsconfigChanged = true;
     }
 
@@ -171,7 +162,7 @@ export class Package {
     const watch = this.packageJson?.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
-        path.endsWith(`/${dependency.dir}/lib`),
+        path.endsWith(`/${dependency.dir}/${libDir}`),
       );
       if (index >= 0) {
         watch.splice(index, 1);
@@ -181,16 +172,13 @@ export class Package {
 
     if (tsconfigChanged) {
       this.files.writeJsonSync(
-        join(this.path, "tsconfig.json"),
+        join(this.path, tsconfigBuildFile),
         this.tsconfig!,
       );
     }
 
     if (packageJsonChanged) {
-      this.files.writeJsonSync(
-        join(this.path, "package.json"),
-        this.packageJson!,
-      );
+      this.files.writeJsonSync(join(this.path, packageFile), this.packageJson!);
     }
   }
 
