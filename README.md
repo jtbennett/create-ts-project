@@ -144,7 +144,7 @@ my-proj
 │   ├── extensions.json
 │   └── settings.json
 ├── config
-│   ├── jest.config.js
+│   ├── nodemon.server.tsc.json
 │   ├── tsconfig.eslint.json
 │   └── tsconfig.node.json
 ├── node_modules
@@ -189,9 +189,6 @@ Your package is located at: `./packages/my-server`. It contains these files:
 ```
 my-lib
 ├── src
-│   ├── jest
-│   │   ├── addMatchers.ts
-│   │   └── createMocks.ts
 │   ├── index.test.ts
 │   └── index.ts
 ├── .eslintrc.js

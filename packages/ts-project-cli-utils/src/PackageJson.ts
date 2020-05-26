@@ -4,4 +4,7 @@ export interface PackageJson {
   dependencies: { [key: string]: string };
   devDependencies: { [key: string]: string };
   nodemonConfig?: { watch: string[] };
+  jest: {
+    moduleNameMapper: { [key: string]: string };
+  };
 }

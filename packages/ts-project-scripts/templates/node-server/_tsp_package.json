@@ -15,7 +15,7 @@
   "scripts": {
     "dev": "tsc --build && concurrently -i -k -n 'app,tsc' -c 'green,cyan' 'nodemon' 'nodemon --config ../../config/nodemon.server.tsc.json'",
     "lint": "eslint ./src --ext .ts --env node",
-    "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
+    "test": "jest --passWithNoTests --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build",
     "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
@@ -43,5 +43,10 @@
     "rimraf": "^3.0.0",
     "ts-node": "^8.10.1",
     "typescript": "~3.8.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": ["<rootDir>/src/**/*.test.ts"]
   }
 }

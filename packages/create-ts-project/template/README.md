@@ -10,7 +10,7 @@ Everything should "just work" out of the box. But if you want to change somethin
 
 - TypeScript compileOptions: [`./config/tsconfig.node.json`](./config/tsconfig.node.json)
 
-- Jest config: [`./config/jest.config.js`](./config/jest.config.js)
+- Jest config: `./package.json` within each package.
 
 - ESLint rules: [`./eslintrc.js`](./eslintrc.js)
 

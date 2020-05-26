@@ -108,6 +108,16 @@ export class Package {
       dependencies[dependency.name] = "*";
     }
 
+    const { jest } = this.packageJson!;
+    if (jest) {
+      jest.moduleNameMapper = jest.moduleNameMapper || {};
+      if (!jest.moduleNameMapper[dependency.name]) {
+        jest.moduleNameMapper[
+          dependency.name
+        ] = `<rootDir>/../${dependency.dir}/src`;
+      }
+    }
+
     const watch = this.packageJson?.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
@@ -149,6 +159,12 @@ export class Package {
     const { dependencies } = this.packageJson!;
     if (dependencies[dependency.name]) {
       delete dependencies[dependency.name];
+      packageJsonChanged = true;
+    }
+
+    const { jest } = this.packageJson!;
+    if (jest?.moduleNameMapper && jest.moduleNameMapper[dependency.name]) {
+      delete jest.moduleNameMapper[dependency.name];
       packageJsonChanged = true;
     }
 

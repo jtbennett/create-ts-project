@@ -24,7 +24,7 @@
   "scripts": {
     "dev": "echo 'This is a library package. Nothing to run. Building in watch mode...' && tsc --build --watch --preserveWatchOutput",
     "lint": "eslint ./src --ext .ts --env node",
-    "test": "jest --passWithNoTests --config ../../config/jest.config.js --rootDir ./",
+    "test": "jest --passWithNoTests --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build",
     "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
@@ -41,5 +41,12 @@
     "jest": "24.9.0",
     "rimraf": "^3.0.0",
     "typescript": "~3.8.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/src/**/*.test.ts"
+    ]
   }
 }
