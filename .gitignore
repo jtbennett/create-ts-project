@@ -10,6 +10,7 @@ lib
 coverage
 node_modules
 *.tsbuildinfo
+my-*
 
 .DS_Store
 .env
