@@ -1,3 +1,5 @@
-// Export modules from this file.
+// Replace the contents of this file with your own exported values.
 
-export default "This is a package for use in node apps.";
+import { basename, dirname } from "path";
+
+export default `${basename(dirname(__dirname)).toUpperCase()}: Hello world`;
