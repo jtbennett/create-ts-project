@@ -1,6 +1,5 @@
 {
   "references": [],
-
   "extends": "../../config/tsconfig.node.json",
   "compilerOptions": {
     "rootDir": "./src",
@@ -9,11 +8,5 @@
     "tsBuildInfoFile": "./tsconfig.tsBuildInfo"
   },
   "include": ["src/**/*.ts", "src/**/*.json"],
-  "exclude": [
-    "node_modules",
-    "lib",
-    "src/jest",
-    "src/**/*.test.ts",
-    "src/**/__mocks__"
-  ]
+  "exclude": ["src/jest", "src/**/*.test.ts", "src/**/__mocks__"]
 }

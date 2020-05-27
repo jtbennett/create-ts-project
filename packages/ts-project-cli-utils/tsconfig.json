@@ -1,5 +1,7 @@
 {
-  "references": [],
   "extends": "./tsconfig.build.json",
-  "exclude": ["node_modules", "lib"]
+  "compilerOptions": {
+    "types": ["node", "jest"]
+  },
+  "exclude": []
 }

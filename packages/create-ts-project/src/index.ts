@@ -45,7 +45,8 @@ const handler = commandHandler(createTsProject);
         .options({
           yarn: {
             boolean: true,
-            describe: "Run yarn after the command completes. Disable with --no-yarn.",
+            describe:
+              "Run yarn after the command completes. Disable with --no-yarn.",
             default: true,
           },
         }),

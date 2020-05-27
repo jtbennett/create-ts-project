@@ -7,11 +7,9 @@ import {
   PackageJson,
 } from "@jtbennett/ts-project-cli-utils";
 import { getPaths, Paths } from "./paths";
+import { existsSync } from "fs-extra";
 
-const tsconfigBuildFile = "tsconfig.build.json";
 const packageFile = "package.json";
-const srcDir = "src";
-const libDir = "lib";
 
 export class Package {
   paths: Paths;
@@ -24,6 +22,10 @@ export class Package {
   packageJson?: PackageJson;
   path: string;
 
+  tsconfigFile: string;
+  srcDir: string;
+  libDir: string;
+
   constructor(options: {
     name: string;
     template?: string;
@@ -31,6 +33,9 @@ export class Package {
     dryRun?: boolean;
     tsconfig?: Tsconfig;
     packageJson?: PackageJson;
+    tsconfigFile?: string;
+    srcDir?: string;
+    libDir?: string;
   }) {
     this.files = getFiles();
     this.paths = getPaths();
@@ -40,6 +45,9 @@ export class Package {
     this.dryRun = !!options.dryRun;
     this.tsconfig = options.tsconfig;
     this.packageJson = options.packageJson;
+    this.tsconfigFile = options.tsconfigFile || "tsconfig.build.json";
+    this.srcDir = options.srcDir || "src";
+    this.libDir = options.libDir || "lib";
 
     this.path = this.paths.getPackagePath(this.dir);
   }
@@ -53,9 +61,11 @@ export class Package {
   static load(path: string) {
     const files = getFiles();
 
-    const tsconfig = files.readJsonSync<Tsconfig>(
-      join(path, tsconfigBuildFile),
-    );
+    const tsconfigFile = existsSync(join(path, "tsconfig.build.json"))
+      ? "tsconfig.build.json"
+      : "tsconfig.json";
+
+    const tsconfig = files.readJsonSync<Tsconfig>(join(path, tsconfigFile));
     tsconfig.references = tsconfig.references || [];
 
     const packageJson = files.readJsonSync<PackageJson>(
@@ -66,7 +76,7 @@ export class Package {
     const name = packageJson.name;
     const dir = basename(path);
 
-    return new Package({ name, dir, packageJson, tsconfig });
+    return new Package({ name, dir, packageJson, tsconfig, tsconfigFile });
   }
 
   create() {
@@ -96,10 +106,10 @@ export class Package {
     const { references } = this.tsconfig!;
 
     const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dir}/${tsconfigBuildFile}`),
+      ref.path.endsWith(`/${dependency.dir}/${this.tsconfigFile}`),
     );
     if (refIndex < 0) {
-      references.push({ path: `../${dependency.dir}/${tsconfigBuildFile}` });
+      references.push({ path: `../${dependency.dir}/${this.tsconfigFile}` });
     }
 
     const { dependencies } = this.packageJson!;
@@ -113,22 +123,22 @@ export class Package {
       if (!jest.moduleNameMapper[dependency.name]) {
         jest.moduleNameMapper[
           dependency.name
-        ] = `<rootDir>/../${dependency.dir}/${srcDir}`;
+        ] = `<rootDir>/../${dependency.dir}/${this.srcDir}`;
       }
     }
 
     const watch = this.packageJson?.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
-        path.endsWith(`/${dependency.dir}/${libDir}`),
+        path.endsWith(`/${dependency.dir}/${this.libDir}`),
       );
       if (index < 0) {
-        watch.push(`../${dependency.name}/${libDir}`);
+        watch.push(`../${dependency.name}/${this.libDir}`);
       }
     }
 
     this.files.writeJsonSync(
-      join(this.path, tsconfigBuildFile),
+      join(this.path, this.tsconfigFile),
       this.tsconfig!,
     );
     this.files.writeJsonSync(join(this.path, packageFile), this.packageJson!);
@@ -140,7 +150,7 @@ export class Package {
 
     const { references } = this.tsconfig!;
     const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dir}/${tsconfigBuildFile}`),
+      ref.path.endsWith(`/${dependency.dir}/${this.tsconfigFile}`),
     );
     if (refIndex >= 0) {
       references.splice(refIndex, 1);
@@ -162,7 +172,7 @@ export class Package {
     const watch = this.packageJson?.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
-        path.endsWith(`/${dependency.dir}/${libDir}`),
+        path.endsWith(`/${dependency.dir}/${this.libDir}`),
       );
       if (index >= 0) {
         watch.splice(index, 1);
@@ -172,7 +182,7 @@ export class Package {
 
     if (tsconfigChanged) {
       this.files.writeJsonSync(
-        join(this.path, tsconfigBuildFile),
+        join(this.path, this.tsconfigFile),
         this.tsconfig!,
       );
     }

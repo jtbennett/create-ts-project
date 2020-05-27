@@ -1,6 +1,6 @@
 {
   "references": [],
-  "extends": "../../config/tsconfig.node.json",
+  "extends": "../../config/tsconfig.browser.json",
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./lib",
