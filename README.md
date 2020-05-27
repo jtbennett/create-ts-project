@@ -145,7 +145,6 @@ my-proj
 │   └── settings.json
 ├── config
 │   ├── nodemon.server.tsc.json
-│   ├── tsconfig.eslint.json
 │   └── tsconfig.node.json
 ├── node_modules
 ├── packages
@@ -254,7 +253,11 @@ This is the conceptual equivalent of removing a dependency in `package.json`. `t
 yarn tsp unref --from my-server --to my-lib
 ```
 
-You will see an error, because `./packages/my-server/src/index.ts` still contains an import from `my-lib`, which is no longer referenced. Remove the code you added and save. The server should restart and run successfully.
+You _should_ see an error in the server, because `./packages/my-server/src/index.ts` still contains an import from `my-lib`, which is no longer referenced.
+
+_Unfortunately, you won't actually see an error._ This is due to how we workaround a limitation in `ts-node`. If you ever forget to remove code after removing a reference like this, the linter will highlight it in your editor. The linter will also generate an error when it is run at the command line.
+
+Remove the code you added to `./packages/my-server/src/index.ts` and save.
 
 ## `tsp` command details
 
