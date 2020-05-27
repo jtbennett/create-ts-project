@@ -17,14 +17,16 @@ cd my-proj
 
 You now have a monorepo ready for development. Open `my-proj` in VS Code or your editor of choice.
 
-Some examples:
+Some example `tsp` commands:
 
 ```bash
 # Add a server app:
 yarn tsp add my-server --template node-server
+# The app is created at ./packages/my-server
 
 # Run the server in dev mode:
 yarn workspace my-server dev
+# The server is running at http://localhost:3000
 
 # Add a library package (-t is the same as --template):
 yarn tsp add my-lib -t node-lib
@@ -33,21 +35,19 @@ yarn tsp add my-lib -t node-lib
 yarn tsp ref --from my-server --to my-lib
 ```
 
-Open `./packages/my-server/src/index.ts` and add:
-
-```typescript
-import aValue from "my-lib";
-console.log(aValue);
-# Save to restart the server and see the new output.
-```
-
 Other useful scripts (see [Yarn scripts](#yarn-scripts) for a full list):
 
 ```bash
 # Run tests for just the my-lib package:
 yarn workspace my-lib test
 
-# Lint, test and build all packages:
+# Run tests for all packages:
+yarn test:all
+
+# Delete build outputs for all packages:
+yarn clean:all
+
+# Lint, test and do a clean build all packages:
 yarn verify:all
 
 ```
@@ -90,7 +90,13 @@ A typical project involves configuring TypeScript, ts-node, jest, eslint, pretti
 
 **_...involves a lot of configuration effort..._**
 
-Separately, each of those tools is straightforward to use. Getting them all working together in harmony takes effort. Doing it in a monorepo is more effort. And keeping them working consistently for all members of a team -- even more effort.
+Separately, each of those tools is straightforward to use.
+
+Getting them all working together in harmony takes effort. For example, we want Jest to be able to find and run our tests, but we don't want test-related files in our build output that will be deployed.
+
+Doing it in a monorepo is more effort. For example, yarn workspaces helps save time and disk space by hoisting and sharing dependencies, but how do we deploy an app with just the specific dependencies it needs?
+
+And keeping them working consistently for all members of a team -- even more effort. For example, does that one person whose linter is using different rules keep breaking the build? Or do semicolons and whitespace make your diffs more difficult to read?
 
 **_...and ongoing hassle..._**
 
@@ -100,11 +106,11 @@ But are you?
 
 - Does your dev server restart when a file in one of its dependencies changes?
 
-- Does TypeScript in your editor know how to resolve types across dependencies so it can highlight errors, offer code completion and navigate source code across packages with F12?
+- Does TypeScript in your editor know how to resolve types across dependencies so it can highlight errors, offer code completion and navigate source code across packages with "Go to definition (F12)"?
 
-- Do the eslint rules that involve TypeScript type checks work across dependencies?
+- Do the eslint rules that check TypeScript types work across dependencies?
 
-- Does Jest resolve the dependencies when you run tests?
+- Can Jest resolve the dependencies when you run tests?
 
 - When built for deployment, can the transpiled .js files be resolved by node?
 
@@ -118,7 +124,8 @@ _It is not recommended to install the `create-ts-project` package. Instead, use 
 
 Prerequisites:
 
-- Install [node >=12.0](https://nodejs.org).
+- Install [node >=12.0](https://nodejs.org). (_node 10.x and 11.x will work, but require a couple of tweaks._)
+
 - Install [yarn >=1.12, <2.0](https://classic.yarnpkg.com) globally (`npm install -g yarn`).
 
 To create a new project, open a terminal and run:
@@ -157,7 +164,7 @@ my-proj
 └── yarn.lock
 ```
 
-Primarily, the files are standard config files for node, TypeScript, jest, eslint and git. There is also a GitHub Action and some config for VS Code.
+Primarily, the files are standard config files for node, TypeScript, jest, eslint, nodemon, git and VS Code. There is also a GitHub Action to lint, test and build on each push to the master branch.
 
 You shouldn't need to make any configuration changes. But if you'd like to know the gory details, see [Configuration](./docs/configuration.md) for more info.
 
@@ -183,16 +190,17 @@ Add a node server package:
 yarn tsp add my-server --template node-server
 ```
 
-Your package is located at: `./packages/my-server`. It contains these files:
+The package is created at: `./packages/my-server`. It contains these files:
 
 ```
-my-lib
+my-server
 ├── src
 │   ├── index.test.ts
 │   └── index.ts
 ├── .eslintrc.js
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── tsconfig.build.json
 ```
 
 Now you can use the scripts included in its `package.json` file to build, test, lint or run the server. Let's run it as you would for development:
@@ -201,18 +209,11 @@ Now you can use the scripts included in its `package.json` file to build, test, 
 yarn workspace my-server dev
 ```
 
-You'll see some messages from `tsc` and `nodemon`, and the output of the server: "Hello world" and a timestamp. (The "server" in the template is just a script that immediately exits.)
+You'll see some messages from `tsc` and `nodemon`, and the output of the server: "MY-SERVER: Hello world". The server is a basic [express](https://expressjs.com) server. You can open your browser to [http://localhost:3000](http://localhost:3000) to see the same message.
 
 If you make a change to `./packages/my-server/src/index.ts`, you'll see the server restart.
 
-Alternatively, you can do this to run scripts inside a single package:
-
-```bash
-cd ./packages/my-server
-yarn dev
-```
-
-The advantage of the `yarn workspace <package> <script>` format is that you don't have to change directories. I find that the longer command is not a hassle, but it's a personal preference.
+_You don't have to use express to use this template. Delete the dependency on express and use whatever web server framework you like. The `dev` script and other configuration is what makes this template suitable for server apps._
 
 ### Add a library package
 
@@ -222,28 +223,43 @@ To create another package, use the same command as above, but specify a differen
 yarn tsp add my-lib -t node-lib
 ```
 
-The package created from the node-lib template has a default export -- a simple string. Let's import it into our server...
+Now let's consume my-lib from my-server.
 
 ### Add a reference (dependency) between packages
 
-This is the conceptual equivalent of adding a dependency in `package.json`. `tsp` does that for you, as well as making corresponding changes to nodemon, TypeScript and other configs.
+This is the conceptual equivalent of adding a dependency in `package.json`. `tsp` makes that change for you, as well as making corresponding changes to nodemon, TypeScript and other configs.
 
 ```bash
 yarn tsp ref --from my-server --to my-lib
 ```
 
-Now open `./packages/my-server/src/index.ts` and at the top of the file add:
+Open `./packages/my-server/src/index.ts` and make the following changes:
 
 ```typescript
-import aValue from "my-lib";
-console.log(aValue);
+// Add this at the top of the file.
+import message from "my-lib";
+
+// Delete this line from the middle of the file:
+const message = `...`;
 ```
 
-When you save the file, you should see in your terminal that nodemon noticed the change and restarted the server. You should see in the terminal the output of the `console.log()`.
+ESlint will highlight unused variables, but the app will still run. Save to see the new message in the output, this time from 'my-lib`.
 
-Now make a change to the string value in `./packages/my-lib/src/index.ts` -- in the referenced package -- and save. You should see the server restart and pick up your change.
+When you save the file, you should see in your terminal that nodemon noticed the change and restarted the server. The message is now from `my-lib`. You can also refresh [http://localhost:3000](http://localhost:3000) in your browser to see the message from `my-lib`.
 
-The server automatically picks up new references as well as any changes made in those referenced packages.
+Now make a change to the exported string value in `./packages/my-lib/src/index.ts` -- in the referenced package -- and save.
+
+In the dev server, you will see `tsc` recompile, but the server will not restart. Adding the reference changed the configuration to watch `my-lib` for changes, but we need to restart the dev server to load that new configuration. In the terminal where the dev server is running:
+
+```bash
+# Enter Ctrl-C to quit the dev server.
+# Hit up arrow and enter to rerun the dev script, or retype it:
+yarn workspace my-server dev
+```
+
+The server restarts and shows the changes you made in `my-lib`. From this point on, it will automatically pick up any changes in `my-lib`.
+
+After adding a new reference to a server package, you'll need to restart the dev server just one time. From then on, it will automatically restart whenever the referenced package changes.
 
 ### Remove a reference (dependency) between packages
 
@@ -255,9 +271,15 @@ yarn tsp unref --from my-server --to my-lib
 
 You _should_ see an error in the server, because `./packages/my-server/src/index.ts` still contains an import from `my-lib`, which is no longer referenced.
 
-_Unfortunately, you won't actually see an error._ This is due to how we workaround a limitation in `ts-node`. If you ever forget to remove code after removing a reference like this, the linter will highlight it in your editor. The linter will also generate an error when it is run at the command line.
+_Unfortunately, you won't actually see an error._ This is due to how we workaround a limitation in `ts-node`. You _will_ see the linter highlighting the problem in your editor. The linter will also generate an error when it is run at the command line.
 
-Remove the code you added to `./packages/my-server/src/index.ts` and save.
+### Cleaning up
+
+You can stop the dev server (with `Ctrl-C`) and completely delete the `my-server` and `my-lib` directories. You will need to rerun `yarn` after deleting them, so that it knows that those workspaces no longer exist.
+
+`tsp` does not make any changes outside of the individual package directories, and never deletes files or directories.
+
+Of course, you can also delete the entire project and generate a new one.
 
 ## `tsp` command details
 
@@ -269,7 +291,7 @@ Remove the code you added to `./packages/my-server/src/index.ts` and save.
 
 - Publishes packages to npm. This only happens if you explicitly decide you want it. But if you do, it's a very straightforward process. Configure it once in just a few minutes, and it will then run automatically whenever you push a new version tag to your GitHub repo.
 
-### `tsp help` option
+### `--help` option
 
 You can get help for `tsp` in the terminal with:
 
@@ -281,25 +303,29 @@ yarn tsp --help
 yarn tsp <command> --help
 ```
 
-### `tsp add` command
+### `--dryrun` option
+
+The `--dryrun` option can be added to any `tsp` command. With this option, the command will show the changes it would make, but will not actually change anything on disk.
+
+### `tsp add <package> --template <template>`
 
 Adds a new package to the `packages` directory, based on a template.
 
-The package name comes after `add`. If a package will be published under an npm @scope, the @scope must be included (e.g., `@my-org/my-package`). The package directory will be name of the package _without_ the scope (e.g., `my-package`).
+If a package will be published under an npm @scope, the @scope must be included in the package name (e.g., `@my-org/my-package`). The package directory will be name of the package _without_ the scope (e.g., `my-package`).
 
 ```bash
 yarn tsp add my-package --template node-lib
-# Package located in: ./packages/my-package.
+# Package will be created at: ./packages/my-package.
 
 yarn tsp add @my-org/my-package --template node-lib
-# Package located in: ./packages/my-package.
+# Package will be created at: ./packages/my-package.
 ```
 
 You can specify a custom directory name using the `--dir` argument:
 
 ```bash
 yarn tsp add my-package --template node-lib --dir custom-name
-# Package located in: ./packages/custom-name.
+# Package will be created at: ./packages/custom-name.
 ```
 
 #### Included templates
@@ -308,7 +334,7 @@ The following templates are included with `tsp`:
 
 - **node-cli.** Use this for command-line interfaces (CLIs).
 
-  The template has dependencies on `yargs` and `chalk`, but you can remove those and use whatever frameworks you like.
+  The template has a dependency on `yargs` , but you can remove it and use whatever frameworks you like.
 
   ```bash
   yarn tsp add my-cli --template my-cli
@@ -335,7 +361,9 @@ The following templates are included with `tsp`:
 
   See the [`ref`](#ref) command to add a reference to the library from another library or app package. That will ensure the library is rebuilt as needed.
 
-- **node-server.** Use this for web/api apps based on express, koa or other frameworks. `nodemon` is preconfigured to restart the server when source files change.
+- **node-server.** Use this for web/api apps. `nodemon` is configured to restart the server when source files change.
+
+  The template has a dependency on `express` , but you can remove it and use whatever frameworks you like.
 
   ```bash
   yarn tsp add my-server --template node-server
@@ -343,8 +371,6 @@ The following templates are included with `tsp`:
   # The dev script runs the server in watch mode.
   yarn workspace my-server dev
   ```
-
-  When running the template as-is, you'll see "Hello world" and a timestamp printed to the console. Make changes to the code and nodemon will restart the app.
 
 #### Custom templates
 
@@ -361,7 +387,22 @@ All files in the directory and any subdirectories will be copied. Any directorie
 
 The only change made to file contents is to set the `name` property of `package.json` (or `_tsp_package.json`) to the name givin to the `add` command (e.g., `my-package`).
 
-### `tsp ref` command
+To work with the rest of the project, your template directory must look like this:
+
+```
+a-template
+├── src
+│   ├── index.test.ts [optional]
+│   └── index.ts [either run your app or export values from here]
+│   [Copy these files from another template]
+├── .eslintrc.js
+├── package.json
+├── tsconfig.json
+└── tsconfig.build.json
+```
+
+
+### `tsp ref`
 
 Adds a reference so that one package in the project can import modules from another package in the project.
 
@@ -377,7 +418,7 @@ import foo from "my-lib";
 
 _Note: After adding a reference from a server package (created from the `node-server` template) to another package, you will need to stop and start the server if it is running with the `dev` script. The `ref` command adds the referenced package to the `nodemon` list of watched files, and `nodemon` must be restarted to pick up the change._
 
-### `tsp unref` command
+### `tsp unref`
 
 Removes a reference from one package to another.
 
@@ -393,7 +434,7 @@ yarn tsp unref --all --to my-lib
 
 _Note: This command does **not** delete the package directory. That is left to the developer._
 
-- ### `tsp release` command
+- ### `tsp release`
 
   _Docs coming soon..._
 

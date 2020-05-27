@@ -10,22 +10,25 @@
     "module": "commonjs",
     "moduleResolution": "node",
 
-    // es2019 requires node >= 12.x.
+    // node >=12.x supports es2019.
+    // To work with node 10.x or 11.x, change these values to "es2017".
+    // See https://node.green for node versions' support of ecmascript
+    // versions and features.
     "target": "es2019",
     "lib": ["es2019"],
 
-    // Allow package to be referenced by other packages.
+    // Allow packages to be referenced by other packages.
     "composite": true,
 
-    // Including "types" prevents auto-load of  @types/* from all ancestor
+    // Including "types" prevents auto-load of @types/* from all ancestor
     // node_modules folders. tsc will always load types for modules you import.
     // "node" provides types for node built-in modules and globals (e.g., path, console).
     // "jest" provides types for jest globals (e.g., jest, describe, it).
-    // To remove these, add a compilerOptions.types in the package-level tsconfig.
+    // To remove/extend these, add compilerOptions.types in the package-level tsconfig.
     // Or you can choose not to extend this config from a specific package (e.g.,
     // a front-end app created with create-react-app). In that case, you'll have to
     // redeclare all the other values in this file, as you want them in that package.
-    // Any types listed here must have the corresponding "@types/xyz" package
+    // Any types listed here must have the corresponding "@types/..." package
     // listed in the root package.json devDependencies.
     "types": ["node", "jest"],
 
@@ -40,6 +43,7 @@
     "strict": true
 
     // ...but you may want to disable some things if they cause pain.
+    // These are common sources of pain:
     // "suppressImplicitAnyIndexErrors": true,
     // "strictPropertyInitialization": false
   }
