@@ -1,6 +1,6 @@
 {
   "name": "@jtbennett/ts-project-scripts",
-  "version": "1.0.0-beta7",
+  "version": "1.0.0-beta10",
   "keywords": [
     "typescript",
     "monorepo",
@@ -41,7 +41,7 @@
     "purge": "yarn clean && rimraf ./coverage ./node_modules"
   },
   "dependencies": {
-    "@jtbennett/ts-project-cli-utils": "^1.0.0-beta7",
+    "@jtbennett/ts-project-cli-utils": "^1.0.0-beta10",
     "chalk": "^4.0.0",
     "fs-extra": "^9.0.0",
     "semver": "7.3.2",
