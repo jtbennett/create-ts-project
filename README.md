@@ -372,6 +372,19 @@ The following templates are included with `tsp`:
   yarn workspace my-server dev
   ```
 
+- **create-react-app.** Use this to integrate a React app generated from `create-react-app` with a `create-ts-project` repo.
+
+  This "template" actually runs [create-react-app](https://github.com/facebook/create-react-app) with the `--template typescript` option. It then updates the `tsconfig.json` and `package.json` to integrate with the rest of the repo.
+
+  ```bash
+  yarn tsp add my-app --template create-react-app
+
+  # CRA uses the "start" script to run a dev server.
+  # "dev" was created as an alias by create-ts-project.
+  # You can use either "start" or "dev".
+  yarn workspace my-app dev
+  ```
+
 #### Custom templates
 
 You can create your own templates anywhere in your file system, and use them with the `add` command.
@@ -400,7 +413,6 @@ a-template
 ├── tsconfig.json
 └── tsconfig.build.json
 ```
-
 
 ### `tsp ref`
 
