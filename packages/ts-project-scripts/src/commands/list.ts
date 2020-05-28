@@ -18,9 +18,14 @@ const handler = tspHandler<
   const all = Package.loadAll();
 
   all.forEach((pkg) => {
-    const refs = all.filter((p) =>
-      pkg.tsconfig?.references.find((r) => basename(r.path) === p.dir),
-    );
+    const refs = all.filter((p) => {
+      const keys = Object.keys(pkg.tsconfigs);
+      if (keys.length > 0) {
+        pkg.tsconfigs[keys[0]].references.find(
+          (r) => basename(r.path) === p.dir,
+        );
+      }
+    });
 
     log.success(`\n${pkg.name}`);
     refs.forEach((r) => {

@@ -1,8 +1,3 @@
-// This file contains all eslint rules.
-
-// See .eslintrc.js files in each package folder and config/tsconfig.eslint.json
-// for more info.
-
 module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",

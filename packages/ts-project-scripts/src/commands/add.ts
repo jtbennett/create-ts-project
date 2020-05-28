@@ -20,11 +20,11 @@ const handler = tspHandler<
       break;
 
     default:
-      new Package({
+      Package.create({
         name: args.pkgName,
+        dir: args.dir,
         template: args.template,
-        dryRun: args.dryRun,
-      }).create();
+      });
   }
 });
 

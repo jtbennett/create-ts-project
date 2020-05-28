@@ -35,11 +35,12 @@ export const addCreateReactApp = (
   log.success("create-react-app succeeded.");
 
   // Overwrite tsconfig.json with our version.
+  // We know there is exactly one tsconfig file.
   const pkg = Package.load(dirName);
-  pkg.tsconfig = tsconfigContents;
+  pkg.tsconfigs[0] = tsconfigContents;
 
   // Add scripts to package.json
-  const scripts = pkg.packageJson!.scripts;
+  const scripts = pkg.packageJson.scripts;
   scripts.dev = "react-scripts start";
   scripts.lint = "eslint ./src --ext .ts,.tsx --env browser";
   scripts.clean = "rimraf ./build";

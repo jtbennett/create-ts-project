@@ -197,7 +197,6 @@ my-server
 ├── src
 │   ├── index.test.ts
 │   └── index.ts
-├── .eslintrc.js
 ├── package.json
 ├── tsconfig.json
 └── tsconfig.build.json

@@ -109,7 +109,7 @@ let files: Files;
 
 export const getFiles = () => {
   if (!files) {
-    throw new CliError("configureFiles() must be called before getFiles().");
+    files = new Files();
   }
 
   return files;

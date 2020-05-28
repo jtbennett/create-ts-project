@@ -193,12 +193,9 @@ moduleNameMapper required for deep imports
 
 _Docs coming soon..._
 
-./config
+./.eslintrc.js
 plugins
-.eslintrc.js in each package folder (can't avoid this noise)
-to set working directories for vscode
 
-Limitations: have to build first, which is why linting is last in `yarn verify` scripts.
 
 ## prettier
 

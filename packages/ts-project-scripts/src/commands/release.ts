@@ -80,12 +80,12 @@ const handler = commandHandler<
       }
 
       log.success(`Setting version to ${args.setVersion}...`);
-      pkg.setVersion(args.setVersion);
+      pkg.version = args.setVersion;
+      pkg.saveChanges();
 
       log.success(`Publishing ${pkg.name}@${args.setVersion} to npm...`);
       const publishCommand =
         `npm publish ${pkg.path}` +
-        (args.dryRun ? " --dry-run" : "") +
         (args.access ? ` --access ${args.access}` : "") +
         (args.tag ? ` --tag ${args.tag}` : "") +
         (args.otp ? ` --otp ${args.otp}` : "");

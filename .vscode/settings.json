@@ -2,4 +2,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.tabSize": 2,
   "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.words": [
+    "tsconfigs"
+  ],
 }

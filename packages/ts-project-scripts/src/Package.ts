@@ -1,125 +1,110 @@
-import { join } from "path";
+import { join, basename } from "path";
 import {
   getFiles,
   CliError,
-  Files,
   Tsconfig,
   PackageJson,
 } from "@jtbennett/ts-project-cli-utils";
-import { getPaths, Paths } from "./paths";
-import { existsSync } from "fs-extra";
+import { getPaths } from "./paths";
+import { readdirSync } from "fs-extra";
 
-const packageFile = "package.json";
+const files = getFiles();
+const paths = getPaths();
+
+const TSCONFIG_BUILD_JSON = "tsconfig.build.json";
+const PACKAGE_JSON = "package.json";
+const tsconfigFilePattern = /^tsconfig.*\.json$/;
 
 export class Package {
-  paths: Paths;
-  files: Files;
-  name: string;
-  template: string;
   dir: string;
-  dryRun: boolean;
-  tsconfig?: Tsconfig;
-  packageJson?: PackageJson;
   path: string;
-
-  tsconfigFile: string;
+  packageJson: PackageJson;
+  tsconfigs: { [key: string]: Tsconfig } = {};
   srcDir: string;
   libDir: string;
 
-  constructor(options: {
-    name: string;
-    template?: string;
-    dir?: string;
-    dryRun?: boolean;
-    tsconfig?: Tsconfig;
-    packageJson?: PackageJson;
-    tsconfigFile?: string;
-    srcDir?: string;
-    libDir?: string;
-  }) {
-    this.files = getFiles();
-    this.paths = getPaths();
-    this.name = options.name;
-    this.template = options.template || "";
-    this.dir = options.dir || this.getNameWithoutScope();
-    this.dryRun = !!options.dryRun;
-    this.tsconfig = options.tsconfig;
+  constructor(options: { packageJson: PackageJson; dir: string }) {
     this.packageJson = options.packageJson;
-    this.tsconfigFile = options.tsconfigFile || "tsconfig.build.json";
-    this.srcDir = options.srcDir || "src";
-    this.libDir = options.libDir || "lib";
+    this.dir = basename(options.dir);
+    this.path = paths.getPackagePath(options.dir);
+    this.srcDir = "src";
+    this.libDir = "lib";
 
-    this.path = this.paths.getPackagePath(this.dir);
+    readdirSync(this.path)
+      .filter((name) => tsconfigFilePattern.exec(name))
+      .forEach((name) => {
+        this.tsconfigs[name] = files.readJsonSync<Tsconfig>(
+          join(this.path, name),
+        );
+      });
   }
 
   static loadAll() {
-    return getPaths()
-      .getAllPackagePaths()
-      .map((path) => Package.load(path));
+    return paths.getAllPackagePaths().map((path) => Package.load(path));
   }
 
   static load(path: string) {
-    const files = getFiles();
-    const paths = getPaths();
-
     const dir = paths.getPackagePath(path);
 
-    const tsconfigFile = existsSync(join(path, "tsconfig.build.json"))
-      ? "tsconfig.build.json"
-      : "tsconfig.json";
-
-    const tsconfig = files.readJsonSync<Tsconfig>(join(path, tsconfigFile));
-    tsconfig.references = tsconfig.references || [];
-
     const packageJson = files.readJsonSync<PackageJson>(
-      join(path, packageFile),
+      join(path, PACKAGE_JSON),
     );
-    packageJson.dependencies = packageJson.dependencies || {};
 
-    const name = packageJson.name;
-
-    return new Package({ name, dir, packageJson, tsconfig, tsconfigFile });
+    return new Package({ packageJson, dir });
   }
 
-  create() {
-    const templatePath = this.paths.getTemplatePath(this.template);
+  static create(args: { name: string; template: string; dir?: string }) {
+    const dir = args.dir || Package.removeScopeIfAny(args.name);
+    const path = paths.getPackagePath(dir);
 
-    this.files.copySync(templatePath, this.path);
+    const templatePath = paths.getTemplatePath(args.template);
+    files.copySync(templatePath, path);
 
-    const path = this.files.dryRun ? templatePath : this.path;
-    const name = this.files.dryRun ? "_tsp_" + packageFile : packageFile;
+    const packageFilePath = join(path, PACKAGE_JSON);
+    const packageJson = files.readJsonSync(packageFilePath);
+    packageJson.name = args.name;
+    files.writeJsonSync(packageFilePath, packageJson);
 
-    const json = this.files.readJsonSync(join(path, name));
-    json.name = this.name;
-    this.files.writeJsonSync(join(path, name), json);
-
-    this.packageJson = json;
-    this.tsconfig = this.files.readJsonSync(join(path, name));
+    return new Package({ packageJson, dir });
   }
 
-  setVersion(version: string) {
-    const packageJsonPath = join(this.path, packageFile);
-    const json = this.files.readJsonSync(packageJsonPath);
-    json.version = version;
-    this.files.writeJsonSync(packageJsonPath, json);
+  get name() {
+    return this.packageJson.name;
+  }
+
+  set name(value: string) {
+    this.packageJson.name = value;
+  }
+
+  get version() {
+    return this.packageJson.version;
+  }
+
+  set version(value: string) {
+    this.packageJson.version = value;
   }
 
   addReferenceTo(dependency: Package) {
-    const { references } = this.tsconfig!;
+    for (const key in this.tsconfigs) {
+      this.tsconfigs[key].references = this.tsconfigs[key].references || [];
+      const references = this.tsconfigs[key].references;
 
-    const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dir}/${this.tsconfigFile}`),
-    );
-    if (refIndex < 0) {
-      references.push({ path: `../${dependency.dir}/${this.tsconfigFile}` });
+      const refIndex = references.findIndex((ref) =>
+        ref.path.endsWith(`/${dependency.dir}/${TSCONFIG_BUILD_JSON}`),
+      );
+      if (refIndex < 0) {
+        references.push({
+          path: `../${dependency.dir}/${TSCONFIG_BUILD_JSON}`,
+        });
+      }
     }
 
-    const { dependencies } = this.packageJson!;
+    const { dependencies } = this.packageJson;
     if (!dependencies[dependency.name]) {
       dependencies[dependency.name] = "*";
     }
 
-    const { jest } = this.packageJson!;
+    const { jest } = this.packageJson;
     if (jest) {
       jest.moduleNameMapper = jest.moduleNameMapper || {};
       if (!jest.moduleNameMapper[dependency.name]) {
@@ -143,28 +128,26 @@ export class Package {
   }
 
   removeReferenceTo(dependency: Package) {
-    let tsconfigChanged = false;
-    let packageJsonChanged = false;
-
-    const { references } = this.tsconfig!;
-    const refIndex = references.findIndex((ref) =>
-      ref.path.endsWith(`/${dependency.dir}/${this.tsconfigFile}`),
-    );
-    if (refIndex >= 0) {
-      references.splice(refIndex, 1);
-      tsconfigChanged = true;
+    for (const key in this.tsconfigs) {
+      const { references } = this.tsconfigs[key];
+      if (!references) {
+        continue;
+      }
+      const refIndex = references.findIndex((ref) =>
+        ref.path.endsWith(`/${dependency.dir}/${TSCONFIG_BUILD_JSON}`),
+      );
+      if (refIndex >= 0) {
+        references.splice(refIndex, 1);
+      }
     }
-
-    const { dependencies } = this.packageJson!;
+    const { dependencies } = this.packageJson;
     if (dependencies[dependency.name]) {
       delete dependencies[dependency.name];
-      packageJsonChanged = true;
     }
 
-    const { jest } = this.packageJson!;
+    const { jest } = this.packageJson;
     if (jest?.moduleNameMapper && jest.moduleNameMapper[dependency.name]) {
       delete jest.moduleNameMapper[dependency.name];
-      packageJsonChanged = true;
     }
 
     const watch = this.packageJson?.nodemonConfig?.watch;
@@ -174,35 +157,32 @@ export class Package {
       );
       if (index >= 0) {
         watch.splice(index, 1);
-        packageJsonChanged = true;
       }
     }
 
-    if (tsconfigChanged || packageJsonChanged) {
-      this.saveChanges();
-    }
+    this.saveChanges();
   }
 
   saveChanges() {
-    this.files.writeJsonSync(
-      join(this.path, this.tsconfigFile),
-      this.tsconfig!,
-    );
-    this.files.writeJsonSync(join(this.path, packageFile), this.packageJson!);
-  }
-
-  private getNameWithoutScope() {
-    if (!this.name.startsWith("@")) {
-      return this.name;
+    for (const key in this.tsconfigs) {
+      files.writeJsonSync(join(this.path, key), this.tsconfigs[key]);
     }
 
-    const delimPos = this.name.indexOf("/");
+    files.writeJsonSync(join(this.path, PACKAGE_JSON), this.packageJson);
+  }
+
+  private static removeScopeIfAny(name: string) {
+    if (!name.startsWith("@")) {
+      return name;
+    }
+
+    const delimPos = name.indexOf("/");
     if (delimPos < 2) {
       throw new CliError(
         "Scoped name starts with '@', but does not contain a '/'.",
       );
     }
 
-    return this.name.substr(delimPos);
+    return name.substr(delimPos);
   }
 }
