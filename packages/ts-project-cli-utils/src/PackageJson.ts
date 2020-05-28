@@ -3,6 +3,7 @@ export interface PackageJson {
   version: string;
   dependencies: { [key: string]: string };
   devDependencies: { [key: string]: string };
+  scripts: { [key: string]: string };
   nodemonConfig?: { watch: string[] };
   jest: {
     moduleNameMapper: { [key: string]: string };

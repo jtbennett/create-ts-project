@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, lstatSync } from "fs-extra";
-import { dirname, join, sep } from "path";
+import { dirname, join, sep, resolve } from "path";
 
 import { CliError, getFiles, Files } from "@jtbennett/ts-project-cli-utils";
 
@@ -56,13 +56,13 @@ export class Paths {
   }
 
   getPackagePath(dirName: string) {
-    return join(this.packagesPath, dirName);
+    return resolve(this.packagesPath, dirName);
   }
 
   getTemplatePath(relativePath: string) {
     let path: string;
     if (relativePath.includes(sep)) {
-      path = join(this.rootPath, relativePath);
+      path = resolve(this.rootPath, relativePath);
     } else {
       path = join(__dirname, "..", "templates", relativePath);
     }

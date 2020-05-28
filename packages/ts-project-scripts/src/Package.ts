@@ -1,4 +1,4 @@
-import { basename, join } from "path";
+import { join } from "path";
 import {
   getFiles,
   CliError,
@@ -60,6 +60,9 @@ export class Package {
 
   static load(path: string) {
     const files = getFiles();
+    const paths = getPaths();
+
+    const dir = paths.getPackagePath(path);
 
     const tsconfigFile = existsSync(join(path, "tsconfig.build.json"))
       ? "tsconfig.build.json"
@@ -74,7 +77,6 @@ export class Package {
     packageJson.dependencies = packageJson.dependencies || {};
 
     const name = packageJson.name;
-    const dir = basename(path);
 
     return new Package({ name, dir, packageJson, tsconfig, tsconfigFile });
   }
@@ -137,11 +139,7 @@ export class Package {
       }
     }
 
-    this.files.writeJsonSync(
-      join(this.path, this.tsconfigFile),
-      this.tsconfig!,
-    );
-    this.files.writeJsonSync(join(this.path, packageFile), this.packageJson!);
+    this.saveChanges();
   }
 
   removeReferenceTo(dependency: Package) {
@@ -180,16 +178,17 @@ export class Package {
       }
     }
 
-    if (tsconfigChanged) {
-      this.files.writeJsonSync(
-        join(this.path, this.tsconfigFile),
-        this.tsconfig!,
-      );
+    if (tsconfigChanged || packageJsonChanged) {
+      this.saveChanges();
     }
+  }
 
-    if (packageJsonChanged) {
-      this.files.writeJsonSync(join(this.path, packageFile), this.packageJson!);
-    }
+  saveChanges() {
+    this.files.writeJsonSync(
+      join(this.path, this.tsconfigFile),
+      this.tsconfig!,
+    );
+    this.files.writeJsonSync(join(this.path, packageFile), this.packageJson!);
   }
 
   private getNameWithoutScope() {

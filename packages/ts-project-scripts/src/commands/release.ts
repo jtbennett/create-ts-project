@@ -1,5 +1,8 @@
 import { EOL } from "os";
 import { Argv } from "yargs";
+import { existsSync, readFileSync } from "fs-extra";
+import { join } from "path";
+import { execSync } from "child_process";
 
 import {
   commandHandler,
@@ -11,9 +14,6 @@ import {
 } from "@jtbennett/ts-project-cli-utils";
 
 import { Package } from "../Package";
-import { existsSync, readFileSync } from "fs-extra";
-import { join } from "path";
-import { execSync } from "child_process";
 
 const getNpmrcPath = () => {
   return execSync("npm config get userconfig").toString().trim();

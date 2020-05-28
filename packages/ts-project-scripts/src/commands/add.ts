@@ -5,6 +5,7 @@ import { cliOptions } from "@jtbennett/ts-project-cli-utils";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
 import { tspHandler } from "../tspHandler";
+import { addCreateReactApp } from "./add-create-react-app";
 
 const handler = tspHandler<
   TspScriptsOptions & {
@@ -13,11 +14,18 @@ const handler = tspHandler<
     template: string;
   }
 >((args) => {
-  new Package({
-    name: args.pkgName,
-    template: args.template,
-    dryRun: args.dryRun,
-  }).create();
+  switch (args.template) {
+    case "create-react-app":
+      addCreateReactApp(args);
+      break;
+
+    default:
+      new Package({
+        name: args.pkgName,
+        template: args.template,
+        dryRun: args.dryRun,
+      }).create();
+  }
 });
 
 export const add = {
@@ -29,7 +37,8 @@ export const add = {
       .usage("Usage: $0 add <pkg-name> -t <template>")
 
       .positional("pkg-name", {
-        desc: "Name of the package to add. Name will be written to package.json.",
+        desc:
+          "Name of the package to add. Name will be written to package.json.",
         type: "string",
       })
       .options({
