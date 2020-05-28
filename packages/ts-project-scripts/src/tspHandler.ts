@@ -12,12 +12,8 @@ export const tspHandler = <TArgs extends TspScriptsOptions>(
     const result = commandFunc(args);
 
     if (args.yarn) {
-      if (args.dryRun) {
-        log.success("[DRYRUN] Running yarn...");
-      } else {
-        log.success("Running yarn...");
-        execSync("yarnpkg install", { stdio: "inherit" });
-      }
+      log.success("Running yarn...");
+      execSync("yarnpkg install", { stdio: "inherit" });
     }
 
     return result;

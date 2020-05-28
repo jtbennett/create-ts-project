@@ -2,12 +2,7 @@
 
 import * as yargs from "yargs";
 
-import {
-  configureFiles,
-  CliOptions,
-  log,
-  setVerbose,
-} from "@jtbennett/ts-project-cli-utils";
+import { CliOptions, log, setVerbose } from "@jtbennett/ts-project-cli-utils";
 
 import { list } from "./commands/list";
 import { add } from "./commands/add";
@@ -24,13 +19,6 @@ import { release } from "./commands/release";
     setVerbose(!!argv.verbose);
     if (argv.verbose) {
       log.success("Verbose logging enabled.");
-    }
-
-    configureFiles({ dryRun: !!argv.dryRun });
-    if (argv.dryRun) {
-      log.success(
-        "This is a dry run. No files will be created, modified or deleted.",
-      );
     }
   })
 

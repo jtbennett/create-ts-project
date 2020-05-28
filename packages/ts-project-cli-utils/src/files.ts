@@ -16,23 +16,9 @@ import { join } from "path";
 import { log } from "./log";
 import { CliError } from "./CliError";
 
-export interface FilesOptions {
-  dryRun?: boolean;
-}
-
 export class Files {
-  readonly dryRun: boolean;
-
-  constructor(options?: FilesOptions) {
-    this.dryRun = !!options && !!options.dryRun;
-  }
-
   mkdirSync(path: string) {
-    if (this.dryRun) {
-      log.info(`[DRYRUN] Creating directory: ${path}`);
-    } else {
-      mkdirSync(path);
-    }
+    mkdirSync(path);
   }
 
   copySync(
@@ -46,14 +32,9 @@ export class Files {
       this.throwIfExists(dest);
     }
 
-    if (this.dryRun) {
-      log.info(`[DRYRUN] Copying from: ${src} to ${dest}`);
-      this.renameTspFilesSync(src);
-    } else {
-      log.info(`Copying from: ${src} to ${dest}`);
-      copySync(src, dest, options);
-      this.renameTspFilesSync(this.dryRun ? src : dest);
-    }
+    log.info(`Copying from: ${src} to ${dest}`);
+    copySync(src, dest, options);
+    this.renameTspFilesSync(dest);
   }
 
   renameTspFilesSync(path: string) {
@@ -78,12 +59,8 @@ export class Files {
     dest: string,
     options: MoveOptions = { overwrite: false },
   ) {
-    if (this.dryRun) {
-      log.info(`[DRYRUN] Moving "${src}" to "${dest}"`);
-    } else {
-      log.info(`Moving "${src}" to "${dest}"`);
-      moveSync(src, dest, options);
-    }
+    log.info(`Moving "${src}" to "${dest}"`);
+    moveSync(src, dest, options);
   }
 
   removeSync(path: string) {
@@ -91,12 +68,8 @@ export class Files {
       log.warn(`Directory not deleted because it does not exist: ${path}`);
       return;
     }
-    if (this.dryRun) {
-      log.info(`[DRYRUN] Deleting the directory: ${path}`);
-    } else {
-      log.info(`Deleting the directory: ${path}`);
-      removeSync(path);
-    }
+    log.info(`Deleting the directory: ${path}`);
+    removeSync(path);
   }
 
   readJsonSync<T = any>(path: string) {
@@ -111,12 +84,8 @@ export class Files {
   }
 
   writeFileSync(path: string, value: string) {
-    if (this.dryRun) {
-      log.info(`[DRYRUN] Updating file: ${path}`);
-    } else {
-      log.info(`Updating file: ${path}`);
-      writeFileSync(path, value);
-    }
+    log.info(`Updating file: ${path}`);
+    writeFileSync(path, value);
   }
 
   throwIfExists(path: string, message?: string) {
@@ -137,14 +106,6 @@ export class Files {
 }
 
 let files: Files;
-
-export const configureFiles = (options?: { dryRun: boolean }) => {
-  if (!files) {
-    files = new Files(options);
-  }
-
-  return files;
-};
 
 export const getFiles = () => {
   if (!files) {

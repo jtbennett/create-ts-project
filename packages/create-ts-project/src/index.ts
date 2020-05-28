@@ -6,7 +6,6 @@ import {
   commandHandler,
   setVerbose,
   log,
-  configureFiles,
   CliOptions,
 } from "@jtbennett/ts-project-cli-utils";
 
@@ -21,13 +20,6 @@ const handler = commandHandler(createTsProject);
     setVerbose(!!argv.verbose);
     if (argv.verbose) {
       log.verbose("Verbose logging enabled.");
-    }
-
-    configureFiles({ dryRun: !!argv.dryRun });
-    if (argv.dryRun) {
-      log.success(
-        "This is a dry run. No files will be created, modified or deleted.",
-      );
     }
   })
 

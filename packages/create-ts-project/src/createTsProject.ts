@@ -167,20 +167,18 @@ const updateRootPackageJson = (projectPath: string, projectName: string) => {
   files.writeJsonSync(join(projectPath, "package.json"), projectPackageJson);
 };
 
-const runYarnInstall = (projectPath: string, dryRun: boolean) => {
-  if (dryRun) {
-    log.info('[DRYRUN] Running "yarnpkg install".');
-  } else {
-    log.info('Running "yarnpkg install".');
-    execSync("yarnpkg install", { cwd: projectPath, stdio: "inherit" });
-  }
+const runYarnInstall = (projectPath: string) => {
+  log.info('Running "yarnpkg install".');
+  execSync("yarnpkg install", { cwd: projectPath, stdio: "inherit" });
 };
 
 const printInstructions = () => {
   //
 };
 
-export const createTsProject = (args: CliOptions & { projectName: string, yarn: boolean }) => {
+export const createTsProject = (
+  args: CliOptions & { projectName: string; yarn: boolean },
+) => {
   checkNodeVersion();
   checkYarnVersion();
   checkProjectName(args.projectName);
@@ -190,13 +188,10 @@ export const createTsProject = (args: CliOptions & { projectName: string, yarn: 
 
   ensureProjectDir(projectPath);
   copyTemplateToProjectDir(templatePath, projectPath);
-  updateRootPackageJson(
-    args.dryRun ? templatePath : projectPath,
-    basename(args.projectName),
-  );
+  updateRootPackageJson(projectPath, basename(args.projectName));
 
   if (args.yarn) {
-    runYarnInstall(projectPath, !!args.dryRun);
+    runYarnInstall(projectPath);
   }
 
   printInstructions();

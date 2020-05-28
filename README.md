@@ -303,10 +303,6 @@ yarn tsp --help
 yarn tsp <command> --help
 ```
 
-### `--dryrun` option
-
-The `--dryrun` option can be added to any `tsp` command. With this option, the command will show the changes it would make, but will not actually change anything on disk.
-
 ### `tsp add <package> --template <template>`
 
 Adds a new package to the `packages` directory, based on a template.
