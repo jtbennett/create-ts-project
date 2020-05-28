@@ -419,7 +419,6 @@ a-template
 │   ├── index.test.ts [optional]
 │   └── index.ts [either run your app or export values from here]
 │   [Copy these files from another template]
-├── .eslintrc.js
 ├── package.json
 ├── tsconfig.json
 └── tsconfig.build.json

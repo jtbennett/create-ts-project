@@ -6,6 +6,10 @@
 module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+    project: ["./packages/*/tsconfig.json"],
+  },
   plugins: ["@typescript-eslint", "node", "jest"],
   extends: [
     // Core eslint recommended rules.
@@ -25,7 +29,7 @@ module.exports = {
   ],
   rules: {
     // Importing any package in the project will likely work in dev because
-    // of the symlinks that yarn workspaces creates in the root node_modules. 
+    // of the symlinks that yarn workspaces creates in the root node_modules.
     // We can't prevent that, but we can tell eslint to fail.
     // (This rule is poorly named. It should be "no-implicit-import".)
     "node/no-extraneous-import": "error",
