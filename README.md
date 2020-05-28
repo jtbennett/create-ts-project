@@ -350,7 +350,7 @@ The following templates are included with `tsp`:
 
   _Note: `chmod` doesn't exist in Windows dev environments unless you are using WSL. You can remove the `chmod` command from the build script in `package.json`, but then your cli may not work as a standalone executable. I'd love suggestions for how to do this effectively/correctly in Windows._
 
-- **node-lib.** Use this for a library that will be published or that will contain code shared by other libraries/apps in the repo.
+- **node-lib.** Use this for a library that will be used in a node application.
 
   ```bash
   yarn tsp add my-lib --template node-lib
@@ -371,6 +371,17 @@ The following templates are included with `tsp`:
   # The dev script runs the server in watch mode.
   yarn workspace my-server dev
   ```
+
+- **browser-lib.** Use this for a library that will be used in a browser application (e.g., a React app).
+
+  ```bash
+  yarn tsp add my-lib --template browser-lib
+
+  # The dev script builds in watch mode:
+  yarn workspace my-lib dev
+  ```
+
+  See the [`ref`](#ref) command to add a reference to the library from another library or app package. That will ensure the library is rebuilt as needed.
 
 - **create-react-app.** Use this to integrate a React app generated from `create-react-app` with a `create-ts-project` repo.
 
