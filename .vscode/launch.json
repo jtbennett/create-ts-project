@@ -1,0 +1,51 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+
+  // NOTE: Debugging with ts-node requires the .js files to exist on disk.
+  //       Build the package before debugging, or no breakpoints will be hit.
+
+  "configurations": [
+    {
+      "name": "create-ts-project",
+      "type": "node",
+      "request": "launch",
+      "args": [
+        "${workspaceFolder}/packages/create-ts-project/src/index.ts",
+        "my-debug"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "env": { "TS_NODE_FILES": "true" }
+    },
+
+    {
+      "name": "create-ts-project - tests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/packages/my-server",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+      "args": ["--verbose", "-i", "--no-cache"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+    },
+
+    {
+      "name": "tsp",
+      "type": "node",
+      "request": "launch",
+      "args": ["${workspaceFolder}/packages/ts-project-scripts/src/index.ts"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "env": { "TS_NODE_FILES": "true" }
+    }
+  ]
+}
