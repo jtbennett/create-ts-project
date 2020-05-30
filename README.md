@@ -451,7 +451,7 @@ yarn tsp unref --all --to my-lib
 
 _Note: This command does **not** delete the package directory. That is left to the developer._
 
-- ### `tsp release`
+- ### `tsp publish`
 
   _Docs coming soon..._
 

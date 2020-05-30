@@ -9,7 +9,7 @@ import { add } from "./commands/add";
 import { ref } from "./commands/ref";
 import { unref } from "./commands/unref";
 
-import { release } from "./commands/release";
+import { publish } from "./commands/publish";
 import { dockerfile } from "./commands/update-dockerfile";
 import { bundle } from "./commands/bundle";
 
@@ -30,7 +30,7 @@ import { bundle } from "./commands/bundle";
   .command(ref as any)
   .command(unref as any)
 
-  .command(release as any)
+  .command(publish as any)
   .command(dockerfile as any)
   .command(bundle as any)
 

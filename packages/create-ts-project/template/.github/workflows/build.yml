@@ -53,7 +53,7 @@ jobs:
       # - Remove "private: true" from the package.json files of the packages you
       #   wish to publish. Fill out other metadata fields.
       #
-      # - Uncomment the "Set release version from tag" and "Release" steps below.
+      # - Uncomment the "Set publish version from tag" and "Publish" steps below.
       # - Remove the line "--access public" below if your package will be private.
       # - Replace the "__PACKAGE_X__" placeholders below with the name(s) of
       #   the packages you want to publish. (Include the @scope, if any.)
@@ -69,18 +69,18 @@ jobs:
       # source control. (Coming soon...)
       # -------------------------------------------------------------------------
 
-      # - name: Set release version from tag
+      # - name: Set publish version from tag
       #   id: version
       #   if: ${{ startsWith(github.ref, 'refs/tags/v') }}
       #   run: |
       #     echo ::set-output name=VERSION::$(echo '${{ github.ref }}' | cut -c 12-)
 
-      # - name: Release
+      # - name: Publish
       #   if: ${{ startsWith(github.ref, 'refs/tags/v') }}
       #   env:
       #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       #   run: |
-      #     yarn tsp release \
+      #     yarn tsp publish \
       #       --access public \
       #       --set-version ${{ steps.version.outputs.VERSION }} \
       #       __PACKAGE_X__ \

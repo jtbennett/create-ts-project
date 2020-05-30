@@ -44,19 +44,19 @@ jobs:
       - name: Lint
         run: yarn lint:all
 
-      - name: Set release version from tag
+      - name: Set publish version from tag
         id: version
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
           echo ::set-output name=VERSION::$(echo '${{ github.ref }}' | cut -c 12-)
 
-      - name: Release
+      - name: Publish
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           node ./packages/ts-project-scripts/lib/index.js \
-            release \
+            publish \
             --access public \
             --set-version ${{ steps.version.outputs.VERSION }} \
             @jtbennett/ts-project-cli-utils \
