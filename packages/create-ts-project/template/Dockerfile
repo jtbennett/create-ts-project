@@ -37,7 +37,7 @@ RUN yarn verify:all
 
 # ----- Bundle apps for deployment -----
 
-RUN packages/ts-project-scripts/lib/index.js bundle --all
+RUN node_modules/.bin/tsp bundle --all
 
 
 # ----------------------------------------

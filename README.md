@@ -149,16 +149,22 @@ my-proj
 │       └── build.yml
 ├── .vscode
 │   ├── extensions.json
-│   └── settings.json
+│   ├── launch.json
+│   ├── settings.json
+│   └── tasks.json
 ├── config
 │   ├── nodemon.server.tsc.json
+│   ├── tsconfig.base.json
+│   ├── tsconfig.browser.json
 │   └── tsconfig.node.json
 ├── node_modules
 ├── packages
 │   └── about-packages.md
+├── .dockerignore
 ├── .eslintignore
 ├── .eslintrc.js
 ├── .gitignore
+├── Dockerfile
 ├── package.json
 ├── README.md
 └── yarn.lock
@@ -302,7 +308,7 @@ yarn tsp --help
 yarn tsp <command> --help
 ```
 
-### `tsp add <package> --template <template>`
+### `tsp add <package> --template <template> [--dir <dir-name>]`
 
 Adds a new package to the `packages` directory, based on a template.
 
@@ -419,7 +425,13 @@ a-template
 └── tsconfig.build.json
 ```
 
-### `tsp ref`
+### `tsp rename --from <old-name> --to <new-name> [--dir <dir-name>]`
+
+_Docs coming soon..._
+
+Renames a package and updates all references to it.
+
+### `tsp ref --from <from-pkg> --to <to-pkg>`
 
 Adds a reference so that one package in the project can import modules from another package in the project.
 
@@ -435,7 +447,7 @@ import foo from "my-lib";
 
 _Note: After adding a reference from a server package (created from the `node-server` template) to another package, you will need to stop and start the server if it is running with the `dev` script. The `ref` command adds the referenced package to the `nodemon` list of watched files, and `nodemon` must be restarted to pick up the change._
 
-### `tsp unref`
+### `tsp unref --from <from-pkg> --to <to-pkg>`
 
 Removes a reference from one package to another.
 
@@ -451,18 +463,30 @@ yarn tsp unref --all --to my-lib
 
 _Note: This command does **not** delete the package directory. That is left to the developer._
 
-- ### `tsp publish`
+### `tsp publish`
 
-  _Docs coming soon..._
+_Docs coming soon..._
 
-  One-time configuration: Follow the instructions in the `./.github/workflows/build.yml` file in your CTSP-generated project.
+One-time configuration: Follow the instructions in the `./.github/workflows/build.yml` file in your CTSP-generated project.
 
-  Then you can publish a new version of the packages you choose with:
+Then you can publish a new version of the packages you choose with:
 
-  ```bash
-  git tag v1.2.3
-  git push --tags
-  ```
+```bash
+git tag v1.2.3
+git push --tags
+```
+
+### `tsp dockerfile`
+
+_Docs coming soon..._
+
+Meant to be run during a CI process. Modifies the Dockerfile included in the template so that all the correct files are included for a build, and also for apps that are to be deployed.
+
+### `tsp bundle <pkg-name | --all>`
+
+_Docs coming soon..._
+
+Meant to be run from within the Dockerfile during the CI process. "Bundles" an app for deployment. For apps, moves the build version of all referenced packages (workspaces in the same repo) and all their transitive dependencies that are required under the app node_modules.
 
 ### About package and directory names
 
