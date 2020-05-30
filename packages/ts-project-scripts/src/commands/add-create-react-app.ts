@@ -37,7 +37,7 @@ export const addCreateReactApp = (
   // Overwrite tsconfig.json with our version.
   // We know there is exactly one tsconfig file.
   const pkg = Package.load(dirName);
-  pkg.tsconfigs[0] = tsconfigContents;
+  pkg.tsconfigs["tsconfig.json"] = tsconfigContents;
 
   // Add scripts to package.json
   const scripts = pkg.packageJson.scripts;

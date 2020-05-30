@@ -8,7 +8,10 @@ import { list } from "./commands/list";
 import { add } from "./commands/add";
 import { ref } from "./commands/ref";
 import { unref } from "./commands/unref";
+
 import { release } from "./commands/release";
+import { dockerfile } from "./commands/update-dockerfile";
+import { bundle } from "./commands/bundle";
 
 (yargs as yargs.Argv<CliOptions>)
   .version(false)
@@ -28,6 +31,8 @@ import { release } from "./commands/release";
   .command(unref as any)
 
   .command(release as any)
+  .command(dockerfile as any)
+  .command(bundle as any)
 
   .demandCommand(1, "You must enter a command.")
   .help()

@@ -5,7 +5,7 @@ import { cliOptions, log } from "@jtbennett/ts-project-cli-utils";
 import { tspHandler } from "../tspHandler";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
-import { basename } from "path";
+import { basename, dirname } from "path";
 
 const handler = tspHandler<
   TspScriptsOptions & {
@@ -18,13 +18,11 @@ const handler = tspHandler<
   const all = Package.loadAll();
 
   all.forEach((pkg) => {
+    const keys = Object.keys(pkg.tsconfigs);
     const refs = all.filter((p) => {
-      const keys = Object.keys(pkg.tsconfigs);
-      if (keys.length > 0) {
-        pkg.tsconfigs[keys[0]].references.find(
-          (r) => basename(r.path) === p.dir,
-        );
-      }
+      return pkg.tsconfigs[keys[0]].references.find((r) => {
+        return basename(dirname(r.path)) === p.dir;
+      });
     });
 
     log.success(`\n${pkg.name}`);

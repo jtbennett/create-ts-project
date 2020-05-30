@@ -4,7 +4,7 @@ import { basename, dirname } from "path";
 // See https://expressjs.com/ for info on using Express to create a web server.
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 const message = `${basename(dirname(__dirname)).toUpperCase()}: Hello world`;
 

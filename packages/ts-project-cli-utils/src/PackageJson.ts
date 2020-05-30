@@ -8,4 +8,9 @@ export interface PackageJson {
   jest: {
     moduleNameMapper: { [key: string]: string };
   };
+  tspConfig?: {
+    bundle?: boolean;
+    deploy?: boolean;
+    publish?: boolean;
+  };
 }

@@ -1,0 +1,12 @@
+.vscode
+docs
+node_modules
+tmp
+
+**/.env
+**/lib
+**/dist
+**/build
+**/coverage
+**/node_modules
+**/yarn-error.log

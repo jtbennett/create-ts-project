@@ -1,4 +1,4 @@
-import { join, basename } from "path";
+import { join, basename, resolve, dirname } from "path";
 import {
   getFiles,
   CliError,
@@ -6,7 +6,7 @@ import {
   PackageJson,
 } from "@jtbennett/ts-project-cli-utils";
 import { getPaths } from "./paths";
-import { readdirSync } from "fs-extra";
+import { readdirSync, statSync } from "fs-extra";
 
 const files = getFiles();
 const paths = getPaths();
@@ -47,7 +47,7 @@ export class Package {
     const dir = paths.getPackagePath(path);
 
     const packageJson = files.readJsonSync<PackageJson>(
-      join(path, PACKAGE_JSON),
+      join(dir, PACKAGE_JSON),
     );
 
     return new Package({ packageJson, dir });
@@ -82,6 +82,18 @@ export class Package {
 
   set version(value: string) {
     this.packageJson.version = value;
+  }
+
+  loadReferences() {
+    const keys = Object.keys(this.tsconfigs);
+    this.tsconfigs[keys[0]].references =
+      this.tsconfigs[keys[0]].references || [];
+    const references = this.tsconfigs[keys[0]].references;
+    return references.map((ref) => {
+      let path = resolve(this.path, ref.path);
+      path = statSync(path).isFile() ? dirname(path) : path;
+      return Package.load(path);
+    });
   }
 
   addReferenceTo(dependency: Package) {
