@@ -6,6 +6,7 @@ import { CliOptions, log, setVerbose } from "@jtbennett/ts-project-cli-utils";
 
 import { list } from "./commands/list";
 import { add } from "./commands/add";
+import { rename } from "./commands/rename";
 import { ref } from "./commands/ref";
 import { unref } from "./commands/unref";
 
@@ -27,6 +28,7 @@ import { bundle } from "./commands/bundle";
 
   .command(list as any)
   .command(add as any)
+  .command(rename as any)
   .command(ref as any)
   .command(unref as any)
 

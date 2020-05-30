@@ -6,7 +6,7 @@ import {
   PackageJson,
 } from "@jtbennett/ts-project-cli-utils";
 import { getPaths } from "./paths";
-import { readdirSync, statSync } from "fs-extra";
+import { readdirSync, statSync, removeSync } from "fs-extra";
 
 const files = getFiles();
 const paths = getPaths();
@@ -53,12 +53,27 @@ export class Package {
     return new Package({ packageJson, dir });
   }
 
-  static create(args: { name: string; template: string; dir?: string }) {
+  static create(args: {
+    name: string;
+    template: string;
+    dir?: string;
+    renameTspFiles?: boolean;
+  }) {
     const dir = args.dir || Package.removeScopeIfAny(args.name);
     const path = paths.getPackagePath(dir);
 
     const templatePath = paths.getTemplatePath(args.template);
-    files.copySync(templatePath, path);
+    const skipFolders = [
+      "build",
+      "dist",
+      "lib",
+      "coverage",
+      "node_modules",
+    ].map((name) => join(templatePath, name));
+    files.copySync(templatePath, path, {
+      renameTspFiles: args.renameTspFiles !== false,
+      filter: (src: string) => !skipFolders.some((s) => src.startsWith(s)),
+    });
 
     const packageFilePath = join(path, PACKAGE_JSON);
     const packageJson = files.readJsonSync(packageFilePath);
@@ -140,6 +155,8 @@ export class Package {
   }
 
   removeReferenceTo(dependency: Package) {
+    let removed = false;
+
     for (const key in this.tsconfigs) {
       const { references } = this.tsconfigs[key];
       if (!references) {
@@ -149,16 +166,20 @@ export class Package {
         ref.path.endsWith(`/${dependency.dir}/${TSCONFIG_BUILD_JSON}`),
       );
       if (refIndex >= 0) {
+        removed = true;
         references.splice(refIndex, 1);
       }
     }
+
     const { dependencies } = this.packageJson;
     if (dependencies[dependency.name]) {
+      removed = true;
       delete dependencies[dependency.name];
     }
 
     const { jest } = this.packageJson;
     if (jest?.moduleNameMapper && jest.moduleNameMapper[dependency.name]) {
+      removed = true;
       delete jest.moduleNameMapper[dependency.name];
     }
 
@@ -168,11 +189,34 @@ export class Package {
         path.endsWith(`/${dependency.dir}/${this.libDir}`),
       );
       if (index >= 0) {
+        removed = true;
         watch.splice(index, 1);
       }
     }
 
-    this.saveChanges();
+    if (removed) {
+      this.saveChanges();
+    }
+
+    return removed;
+  }
+
+  rename(newName: string, newDir?: string) {
+    const newPkg = Package.create({
+      name: newName,
+      template: this.path,
+      dir: newDir,
+      renameTspFiles: false,
+    });
+
+    Package.loadAll().forEach((pkg) => {
+      const removed = pkg.removeReferenceTo(this);
+      if (removed) {
+        pkg.addReferenceTo(newPkg);
+      }
+    });
+
+    removeSync(this.path);
   }
 
   saveChanges() {

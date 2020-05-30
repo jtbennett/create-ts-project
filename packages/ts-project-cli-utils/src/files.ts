@@ -24,8 +24,15 @@ export class Files {
   copySync(
     src: string,
     dest: string,
-    options: CopyOptionsSync = { overwrite: false, errorOnExist: true },
+    options: CopyOptionsSync & { renameTspFiles?: boolean } = {},
   ) {
+    const { renameTspFiles, ...copyOptions } = {
+      overwrite: false,
+      errorOnExist: true,
+      renameTspFiles: true,
+      ...options,
+    };
+
     this.throwIfMissing(src);
 
     if (options.errorOnExist) {
@@ -33,8 +40,11 @@ export class Files {
     }
 
     log.info(`Copying from: ${src} to ${dest}`);
-    copySync(src, dest, options);
-    this.renameTspFilesSync(dest);
+    copySync(src, dest, copyOptions);
+
+    if (renameTspFiles !== false) {
+      this.renameTspFilesSync(dest);
+    }
   }
 
   renameTspFilesSync(path: string) {
