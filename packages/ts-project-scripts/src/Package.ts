@@ -238,7 +238,10 @@ export class Package {
         "Scoped name starts with '@', but does not contain a '/'.",
       );
     }
+    if (delimPos === name.length - 1) {
+      throw new CliError("Name cannot end in '/'.");
+    }
 
-    return name.substr(delimPos);
+    return name.substr(delimPos + 1);
   }
 }
