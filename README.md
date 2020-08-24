@@ -86,7 +86,7 @@ As a result, these projects are usually monorepos -- multiple packages/apps in t
 
 **_...plus a lot of interdependent tools..._**
 
-A typical project involves configuring TypeScript, ts-node, jest, eslint, prettier, nodemon, Docker, VS Code, a CI process in GitHub Actions or CircleCI or TravisCI or Jenkins, deployments to Heroku or AWS or Azure or Google Cloud, and sometimes publishing to npm.
+A typical project involves configuring TypeScript, jest, eslint, prettier, nodemon, Docker, VS Code, a CI process in GitHub Actions or CircleCI or TravisCI or Jenkins, deployments to Heroku or AWS or Azure or Google Cloud, and sometimes publishing to npm.
 
 **_...involves a lot of configuration effort..._**
 
@@ -152,8 +152,10 @@ my-proj
 │   ├── launch.json
 │   ├── settings.json
 │   └── tasks.json
+├── .yarn
+│   ├── plugins
+│   └── releases
 ├── config
-│   ├── nodemon.server.tsc.json
 │   ├── tsconfig.base.json
 │   ├── tsconfig.browser.json
 │   └── tsconfig.node.json
@@ -164,6 +166,7 @@ my-proj
 ├── .eslintignore
 ├── .eslintrc.js
 ├── .gitignore
+├── .yarnrc.yml
 ├── Dockerfile
 ├── package.json
 ├── README.md
@@ -216,13 +219,13 @@ yarn workspace my-server dev
 
 You'll see some messages from `tsc` and `nodemon`, and the output of the server: "MY-SERVER: Hello world". The server is a basic [express](https://expressjs.com) server. You can open your browser to [http://localhost:3000](http://localhost:3000) to see the same message.
 
-If you make a change to `./packages/my-server/src/index.ts`, you'll see the server restart.
+If you save a change to `./packages/my-server/src/index.ts`, you'll see the server restart.
 
 _You don't have to use express to use this template. Delete the dependency on express and use whatever web server framework you like. The `dev` script and other configuration is what makes this template suitable for server apps._
 
 ### Add a library package
 
-To create another package, use the same command as above, but specify a different template. This time we'll use the shorthand `-t` instead of `--template`. You can leave the server running and do this in a separate terminal window:
+To create another package, use the same command as above, but specify a different template. This time we'll use the shorthand `-t` instead of `--template`. Stop the server with `Ctrl-C` and run:
 
 ```bash
 yarn tsp add my-lib -t node-lib
@@ -234,11 +237,14 @@ Now let's consume my-lib from my-server.
 
 This is the conceptual equivalent of adding a dependency in `package.json`. `tsp` makes that change for you, as well as making corresponding changes to nodemon, TypeScript and other configs.
 
+You first need to stop the server with `Ctrl-C`. Then, to add the reference and restart the server:
+
 ```bash
 yarn tsp ref --from my-server --to my-lib
+yarn workspace my-server dev
 ```
 
-Open `./packages/my-server/src/index.ts` and make the following changes:
+Open `./packages/my-server/src/index.ts` and save the following changes:
 
 ```typescript
 // Add this at the top of the file.
@@ -248,23 +254,13 @@ import message from "my-lib";
 const message = `...`;
 ```
 
-ESlint will highlight unused variables, but the app will still run. Save to see the new message in the output, this time from 'my-lib`.
+ESlint will highlight unused variables, but the app will still run.
 
 When you save the file, you should see in your terminal that nodemon noticed the change and restarted the server. The message is now from `my-lib`. You can also refresh [http://localhost:3000](http://localhost:3000) in your browser to see the message from `my-lib`.
 
 Now make a change to the exported string value in `./packages/my-lib/src/index.ts` -- in the referenced package -- and save.
 
-In the dev server, you will see `tsc` recompile, but the server will not restart. Adding the reference changed the configuration to watch `my-lib` for changes, but we need to restart the dev server to load that new configuration. In the terminal where the dev server is running:
-
-```bash
-# Enter Ctrl-C to quit the dev server.
-# Hit up arrow and enter to rerun the dev script, or retype it:
-yarn workspace my-server dev
-```
-
-The server restarts and shows the changes you made in `my-lib`. From this point on, it will automatically pick up any changes in `my-lib`.
-
-After adding a new reference to a server package, you'll need to restart the dev server just one time. From then on, it will automatically restart whenever the referenced package changes.
+In the dev server, you will see `tsc` recompile, the server restart, and the new message from `my-lib`.
 
 ### Remove a reference (dependency) between packages
 
@@ -276,7 +272,7 @@ yarn tsp unref --from my-server --to my-lib
 
 You _should_ see an error in the server, because `./packages/my-server/src/index.ts` still contains an import from `my-lib`, which is no longer referenced.
 
-_Unfortunately, you won't actually see an error._ This is due to how we workaround a limitation in `ts-node`. You _will_ see the linter highlighting the problem in your editor. The linter will also generate an error when it is run at the command line.
+_Unfortunately, you won't actually see an error._ But you _will_ see the linter highlighting the problem in your editor. The linter will also generate an error when it is run at the command line.
 
 ### Cleaning up
 
@@ -537,28 +533,26 @@ The `dev` and `build` scripts are different in each package template, because th
 
   - **node-server**
 
-    Uses `concurrently` to build the server in watch mode and run it in `ts-node`.
+    Uses `concurrently` to simultaneously:
+    
+    - Build the server in watch mode.
 
-    `nodemon` restarts the `ts-node` server on each file change. See the `nodemonConfig` property of `package.json` for the exact config. (Actually runs `concurrently` to work around a limitation of `ts-node`. See [nodemon config] for details.)
-
-    _The build in watch mode is required because `ts-node` doesn't yet understand TypeScript project references._
+    - Run the server in `nodemon`. `nodemon` restarts `node` on each file change. See the `nodemonConfig` property of `package.json` for the exact config.
 
   - **node-cli**
 
-    Builds and runs the CLI entry point script using `ts-node`. Any parameters passed to dev are forwarded to the CLI.
+    Builds and runs the CLI entry point script. Any parameters passed to dev are forwarded to the CLI.
 
     ```bash
     # This will pass 'foo --bar baz' to your CLI entry point.
     yarn dev foo --bar baz
     ```
 
-    _The initial build is required because `ts-node` doesn't yet understand TypeScript project references._
-
   - **node-lib**
 
     Builds the library in watch mode, so it rebuilds on each file change.
 
-    _Note: Libraries are automatically built by the projects that reference them and rebuilt when files change (in watch mode). The only case where you would typically run the `dev` script for a library is for a standalone package that you intend to publish to npm._
+    _Note: Libraries are automatically built by the projects that reference them and rebuilt when files change (in watch mode). You won't typically run the `dev` script for a library._
 
 - **`build`**
 
@@ -606,7 +600,7 @@ I recommend that you also create a task to run each server in your repo in dev m
 
 - **No magic.** Everything is done with standard configuration files for typescript, node, eslint, jest, prettier, nodemon, etc. Customize them as you like, or create your own templates.
 
-- **Be practical.** There are a few compromises in this setup. For example, an extra build has to happen before running the node-server template in watch mode, because `ts-node` doesn't yet understand project references. Those compromises will be removed if and when the tools make it possible. In the meantime, they're small and probably won't be noticeable.
+- **Be practical.** There are a few compromises in this setup. For example, an extra build has to happen before running the node-server template in watch mode, to avoid a race between the compiler and nodemon. Those compromises will be removed if and when the tools make it possible. In the meantime, they're small and probably won't be noticeable.
 
 ## Tools included
 
@@ -618,7 +612,6 @@ For development:
 - jest - testing.
 - eslint - linting.
 - yarn v1.x - package management and running scripts.
-- ts-node - running node-based apps written in typescript.
 - prettier - formatting code.
 - Docker - running dev-time dependencies like databases. _Coming soon!_
 - VS Code - code editor. (Not required, but you may need to configure other editors for linting, formatting, etc.)

@@ -128,7 +128,7 @@ export class Package {
 
     const { dependencies } = this.packageJson;
     if (!dependencies[dependency.name]) {
-      dependencies[dependency.name] = "*";
+      dependencies[dependency.name] = "workspace:*";
     }
 
     const { jest } = this.packageJson;

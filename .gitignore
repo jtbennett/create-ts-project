@@ -1,7 +1,7 @@
+# If using yarn 2.x, remove these three lines to commit your dependencies to git.
 .yarn/*
 !.yarn/releases
 !.yarn/plugins
-.pnp.*
 
 _tmp
 build
@@ -9,7 +9,7 @@ dist
 lib
 coverage
 node_modules
-*.tsbuildinfo
+*.tsBuildInfo
 my-*
 
 .DS_Store

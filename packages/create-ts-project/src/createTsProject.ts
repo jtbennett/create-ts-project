@@ -19,7 +19,7 @@ import {
  */
 const checkYarnVersion = () => {
   const minYarn = "1.12.0";
-  const maxYarn = "2.0.0";
+  const maxYarn = "3.0.0";
   let hasMinYarn = false;
   let hasMaxYarn = false;
   let version = null;
@@ -151,22 +151,6 @@ const copyTemplateToProjectDir = (
   });
 };
 
-const updateRootPackageJson = (projectPath: string, projectName: string) => {
-  const files = getFiles();
-  const templateVersion = files.readJsonSync<PackageJson>(
-    join(__dirname, "..", "package.json"),
-  ).version;
-
-  const projectPackageJson = files.readJsonSync<PackageJson>(
-    join(projectPath, "package.json"),
-  );
-  projectPackageJson.name = projectName;
-  projectPackageJson.devDependencies[
-    "@jtbennett/ts-project-scripts"
-  ] = `^${templateVersion}`;
-  files.writeJsonSync(join(projectPath, "package.json"), projectPackageJson);
-};
-
 const runYarnInstall = (projectPath: string) => {
   log.info('Running "yarnpkg install".');
   execSync("yarnpkg install", { cwd: projectPath, stdio: "inherit" });
@@ -188,7 +172,6 @@ export const createTsProject = (
 
   ensureProjectDir(projectPath);
   copyTemplateToProjectDir(templatePath, projectPath);
-  updateRootPackageJson(projectPath, basename(args.projectName));
 
   if (args.yarn) {
     runYarnInstall(projectPath);

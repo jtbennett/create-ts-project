@@ -8,29 +8,28 @@
     ]
   },
   "scripts": {
-    "lint:all": "yarn workspaces run lint",
-    "test:all": "yarn workspaces run test",
-    "clean:all": "yarn workspaces run clean",
-    "build:all": "yarn workspaces run build",
-    "verify:all": "yarn workspaces run verify",
-    "purge:all": "yarn workspaces run purge && rimraf './node_modules'",
+    "lint:all": "yarn workspaces foreach run lint",
+    "test:all": "yarn workspaces foreach run test",
+    "clean:all": "yarn workspaces foreach run clean",
+    "build:all": "yarn workspaces foreach run build",
+    "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all",
+    "purge:all": "yarn workspaces foreach run purge && rimraf './node_modules'",
     "tsp": "tsp"
   },
   "devDependencies": {
-    "@jtbennett/ts-project-scripts": "^1.0.0-beta14",
+    "@jtbennett/ts-project-scripts": "*",
     "@types/jest": "24.0.18",
     "@types/node": "^12.7.8",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.31.0",
+    "concurrently": "^5.2.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-jest": "^23.9.0",
     "eslint-plugin-node": "^11.1.0",
-    "jest": "24.9.0",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "ts-jest": "^24.0.2",
-    "typescript": "~3.9.3"
+    "typescript": "~4.0.2"
   },
   "prettier": {
     "trailingComma": "all"

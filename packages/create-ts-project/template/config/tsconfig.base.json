@@ -8,10 +8,6 @@
     // Allow packages to be referenced by other packages.
     "composite": true,
 
-    // Fix an issue with ts-node and symlinks created by yarn workspaces.
-    // See https://github.com/TypeStrong/ts-node/issues/797
-    "preserveSymlinks": true,
-
     // Including "types" prevents auto-load of @types/* from all ancestor
     // node_modules folders. tsc will always load types for modules you import from.
     // For example:

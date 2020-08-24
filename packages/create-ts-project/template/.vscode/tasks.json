@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "problemMatcher": [],
   "type": "shell",
-  "options": { "cwd": "${workspaceRoot}" },
+  "options": { "cwd": "${workspaceFolder}" },
   "inputs": [
     {
       "id": "packageName",

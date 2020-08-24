@@ -39,6 +39,8 @@ If your team would benefit from common use of other VS Code extensions, you may 
 
 _For info about the scripts included in the root and package template `package.json` files, see [Yarn scripts](./yarn-scripts.md)._
 
+This project is initially configured to use yarn v2 with the `node_modules` linker. This is configured in `./yarnrc.yml`. (The pnp linker might work, but I have avoided it for now because it requires additional IDE setup.)
+
 Yarn workspaces are configured in the root `package.json` with:
 
 ```json
@@ -67,9 +69,7 @@ Yarn workspaces does the following:
   - `./packages/node_modules/pkg-b` - Not found.
   - `./node_modules/pkg-b` - Success! Thanks to the symlink.
 
-  _Note 1: TypeScript resolution works differently, using project references and the `paths` option. See [TypeScript config](#typescript) for more info._
-
-  _Note 2: See [ts_node](#ts-node) for why we need the symlink at runtime._
+  _Note: TypeScript resolution works differently, using project references and the `paths` option. See [TypeScript config](#typescript) for more info._
 
 - Handles dependencies on local workspaces. When it sees a package name in `dependencies` or `devDependencies` that matches the package name of a workspace (not necessarily the same as the directory name), yarn knows that at runtime, the symlinks it created (see previous bullet) will allow the dependency to be resolved correctly.
 
@@ -152,34 +152,21 @@ The initial config looks like this:
 ```json
 {
   "nodemonConfig": {
-    "exec": "ts-node ./src/index.ts --files",
+    "exec": "node ./lib/index.js",
     "ext": "ts,json",
     "ignore": ["./src/jest", "./src/**/*.test.ts", "./src/**/__mocks__"],
     "watch": [
       ".env",
       "./src",
       "./tsconfig.json",
-      "../../config/tsconfig.node.json"
+      "../../config/tsconfig.node.json",
+      "../../config/tsconfig.base.json"
     ]
   }
 }
 ```
 
 `tsp ref` and `tsp unref` modify the `watch` value for you, so that a change to a source file in a dependency will cause the server to restart.
-
-## ts-node
-
-`ts-node` does not require any configuration. The configurations of `yarn workspaces`, `tsc` and `nodemon` (which are managed for you by `tsp`) ensure that `ts-node` can resolve types and modules at runtime.
-
-`ts-node` [does not support](https://github.com/TypeStrong/ts-node/issues/897) TypeScript project references. This is the "limitation" referred to in multiple places in this documentation. For this reason:
-
-- We need the symlinks to referenced packages created by yarn workspaces in order for those dependencies to be resolvable at runtime.
-
-- We need to build with `tsc --build` before running `ts-node` and to run `tsc --build --watch` in parallel with `nodemon` for server packages.
-
-If and when a future version of `ts-node` supports project references,
-
-`ts-node` is not used at runtime in a deployed app -- only during development.
 
 ## jest
 

@@ -11,27 +11,31 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
     "dev": "yarn build --watch --preserveWatchOutput",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "jest --passWithNoTests --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build ./tsconfig.build.json",
-    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "verify": "yarn lint --max-warnings 0 && yarn test && yarn clean && yarn build",
     "purge": "yarn clean && rimraf ./coverage ./node_modules"
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^12.7.8",
     "eslint": "^6.8.0",
-    "jest": "24.9.0",
-    "rimraf": "^3.0.0",
-    "typescript": "~3.9.3"
+    "jest": "26.3.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.2.0",
+    "typescript": "~4.0.2"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "testMatch": ["<rootDir>/src/**/*.test.ts"]
+    "testMatch": [
+      "<rootDir>/src/**/*.test.ts"
+    ]
   }
 }
