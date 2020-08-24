@@ -14,7 +14,6 @@
     "clean:all": "yarn workspaces foreach run clean",
     "build:all": "yarn workspaces foreach run build",
     "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all",
-    "version:all": "yarn workspaces foreach version",
     "purge:all": "yarn workspaces foreach run purge && rimraf './node_modules'",
     "ctsp:dev": "yarn workspace @jtbennett/create-ts-project dev --no-yarn",
     "ctsp:test": "yarn workspace @jtbennett/create-ts-project test",
