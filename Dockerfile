@@ -14,6 +14,7 @@ WORKDIR /tmp/build
 
 COPY package.json /tmp/build/
 COPY yarn.lock /tmp/build/
+COPY .yarn /tmp/build/
 
 # "tsp dockerfile" will insert a COPY instruction below for each package. 
 # The COPY will be in the format:
