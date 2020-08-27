@@ -85,7 +85,7 @@ const handler = commandHandler<
 
       log.success(`Publishing ${pkg.name}@${args.setVersion} to npm...`);
       const publishCommand =
-        `npm publish ${pkg.path}` +
+        `yarn npm publish ${pkg.path}` +
         (args.access ? ` --access ${args.access}` : "") +
         (args.tag ? ` --tag ${args.tag}` : "") +
         (args.otp ? ` --otp ${args.otp}` : "");
