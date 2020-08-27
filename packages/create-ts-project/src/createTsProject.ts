@@ -8,7 +8,6 @@ import {
   CliError,
   CliOptions,
   getFiles,
-  PackageJson,
   log,
   logAndExit,
 } from "@jtbennett/ts-project-cli-utils";
