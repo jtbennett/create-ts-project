@@ -61,12 +61,6 @@ jobs:
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          pushd ./packages/ts-project-cli-utils
-          yarn npm publish --access public --set-version ${{ steps.version.outputs.VERSION }}
-          popd
-          pushd ./packages/ts-project-scripts
-          yarn npm publish --access public --set-version ${{ steps.version.outputs.VERSION }}
-          popd
-          pushd ./packages/create-ts-project
-          yarn npm publish --access public --set-version ${{ steps.version.outputs.VERSION }}
-          popd
+          yarn workspace @jtbennett/ts-project-cli-utils npm publish --access public
+          yarn workspace @jtbennett/ts-project-scripts npm publish --access public
+          yarn workspace @jtbennett/create-ts-project npm publish --access public
