@@ -1,6 +1,9 @@
 name: Build
 
 on:
+  create:
+    tag:
+      - "v*"
   push:
     branches:
       - main
