@@ -459,19 +459,6 @@ yarn tsp unref --all --to my-lib
 
 _Note: This command does **not** delete the package directory. That is left to the developer._
 
-### `tsp publish`
-
-_Docs coming soon..._
-
-One-time configuration: Follow the instructions in the `./.github/workflows/build.yml` file in your CTSP-generated project.
-
-Then you can publish a new version of the packages you choose with:
-
-```bash
-git tag v1.2.3
-git push --tags
-```
-
 ### `tsp dockerfile`
 
 _Docs coming soon..._
@@ -517,7 +504,17 @@ For details on what each script actually does, see [Package-level scripts](#pack
 
 _Note: **The corresponding scripts must exist in all packages** or yarn will exit with an error. If you don't want a package-level script to do anything, you can make its value `echo`._
 
-In addition, there is one root-level scripts that doesn't have an equivalent at the package level:
+In addition, there are two root-level scripts that don't have an equivalent at the package level:
+
+- **`version:all <version>`**
+
+  The version argument should be a valid npm version number like `1.2.3` or `2.0.0-beta.1`.
+
+  This script is helpful when publishing packages to npm. It does three things:
+
+  - Sets the version property in all `package.json` files (including the root) to the specified version.
+  - Commits those changes to your repo.
+  - Creates a tag in the form: `v1.2.3`.
 
 - **`tsp`**
 
@@ -534,7 +531,7 @@ The `dev` and `build` scripts are different in each package template, because th
   - **node-server**
 
     Uses `concurrently` to simultaneously:
-    
+
     - Build the server in watch mode.
 
     - Run the server in `nodemon`. `nodemon` restarts `node` on each file change. See the `nodemonConfig` property of `package.json` for the exact config.
@@ -585,6 +582,58 @@ The remaining scripts are the same in all package templates:
 - **`purge`**
 
   Runs the `clean` script to delete build outputs, and also deletes the package's `node_modules` and `coverage` folders.
+
+## Publishing packages to npm
+
+### One-time setup for publishing
+
+The [`.github/workflows/build.yml`](./.github/workflows/build.yml) file contains commented-out tasks that can publish your packages to npm automatically when you push a new git tag to github.
+
+_Note: This setup only supports the case where all packages have the same version number._
+
+To automate publishing of your packages:
+
+- Add a secret to your github repo named `NPM_TOKEN` with a valid token for publishing to npm.
+
+- Remove "private: true" from the package.json files of the packages you wish to publish. Fill out other metadata fields like license, author, description, etc.
+
+- In [`.github/workflows/build.yml`](./.github/workflows/build.yml):
+
+  - Uncomment the `Set publish version from tag` and `Publish` steps.
+
+  - Under the `Publish` step, remove "--access public" if your package will not be public.
+
+  - Replace `__PACKAGE_X__` with the name of a package you want to publish. (Include the @scope, if any.)
+
+  - Duplicate the `yarn workspace ... npm publish ...` line for any additional packages you want to publish.
+
+### Publish a new version
+
+The package(s) will be published to npm when a tag like `v1.2.3` is pushed to github. (Where `1.2.3` is any valid npm version number.)
+
+**Be sure the version in each package.json matches the tag value!**
+
+The `version:all` yarn script (described above) will keep everything in sync for you:
+
+```bash
+yarn version:all 1.2.3
+```
+
+That script will:
+
+- Set the version in package.json for all packages (including the root) to `1.2.3`.
+
+- Commit those changes to your local copy of the repo.
+
+- Tag the commit with `v1.2.3`.
+
+Kick off a publish by pushing the tag to your github repo:
+
+```bash
+git push --follow-tags
+```
+
+If your build succeeds, the package(s) will be published to npm!
 
 ## VS Code tasks
 

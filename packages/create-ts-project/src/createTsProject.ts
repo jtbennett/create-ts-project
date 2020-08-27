@@ -10,6 +10,7 @@ import {
   getFiles,
   log,
   logAndExit,
+  PackageJson,
 } from "@jtbennett/ts-project-cli-utils";
 
 /**
@@ -150,6 +151,27 @@ const copyTemplateToProjectDir = (
   });
 };
 
+const updateRootPackageJson = (projectPath: string, projectName: string) => {
+  const files = getFiles();
+
+  const latestScriptsVersion = execSync(
+    "npm view @jtbennett/ts-project-scripts@latest version",
+    {
+      cwd: projectPath,
+      encoding: "utf8",
+    },
+  );
+
+  const projectPackageJson = files.readJsonSync<PackageJson>(
+    join(projectPath, "package.json"),
+  );
+  projectPackageJson.name = projectName;
+  projectPackageJson.devDependencies[
+    "@jtbennett/ts-project-scripts"
+  ] = `^${latestScriptsVersion}`;
+  files.writeJsonSync(join(projectPath, "package.json"), projectPackageJson);
+};
+
 const runYarnInstall = (projectPath: string) => {
   log.info('Running "yarnpkg install".');
   execSync("yarnpkg install", { cwd: projectPath, stdio: "inherit" });
@@ -171,6 +193,7 @@ export const createTsProject = (
 
   ensureProjectDir(projectPath);
   copyTemplateToProjectDir(templatePath, projectPath);
+  updateRootPackageJson(projectPath, args.projectName);
 
   if (args.yarn) {
     runYarnInstall(projectPath);
