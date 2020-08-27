@@ -1,6 +1,6 @@
 {
   "name": "@jtbennett/ts-project-cli-utils",
-  "version": "1.0.0-beta17",
+  "version": "1.0.0-beta20",
   "keywords": [],
   "description": "Command line utilities used by CLIs in https://github.com/jtbennett/create-ts-project",
   "author": "John Bennett <john@jtbennett.com>",
