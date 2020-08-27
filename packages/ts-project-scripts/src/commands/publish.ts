@@ -85,12 +85,12 @@ const handler = commandHandler<
 
       log.success(`Publishing ${pkg.name}@${args.setVersion} to npm...`);
       const publishCommand =
-        `yarn npm publish ${pkg.path}` +
+        `yarn npm publish` +
         (args.access ? ` --access ${args.access}` : "") +
         (args.tag ? ` --tag ${args.tag}` : "") +
         (args.otp ? ` --otp ${args.otp}` : "");
       log.info(publishCommand);
-      execSync(publishCommand, { stdio: "inherit" });
+      execSync(publishCommand, { cwd: pkg.path, stdio: "inherit" });
 
       log.success("Publish complete.");
     });
