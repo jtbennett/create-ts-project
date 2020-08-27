@@ -59,12 +59,14 @@ jobs:
       - name: Publish
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          node ./packages/ts-project-scripts/lib/index.js \
-            publish \
-            --access public \
-            --set-version ${{ steps.version.outputs.VERSION }} \
-            @jtbennett/ts-project-cli-utils \
-            @jtbennett/ts-project-scripts \
-            @jtbennett/create-ts-project
+          pushd ./packages/ts-project-cli-utils
+          yarn npm publish --access public --set-version ${{ steps.version.outputs.VERSION }}
+          popd
+          pushd ./packages/ts-project-scripts
+          yarn npm publish --access public --set-version ${{ steps.version.outputs.VERSION }}
+          popd
+          pushd ./packages/create-ts-project
+          yarn npm publish --access public --set-version ${{ steps.version.outputs.VERSION }}
+          popd
