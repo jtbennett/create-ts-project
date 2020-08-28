@@ -160,7 +160,7 @@ const updateRootPackageJson = (projectPath: string, projectName: string) => {
       cwd: projectPath,
       encoding: "utf8",
     },
-  );
+  ).trim();
 
   const projectPackageJson = files.readJsonSync<PackageJson>(
     join(projectPath, "package.json"),
