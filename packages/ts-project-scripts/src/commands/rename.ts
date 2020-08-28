@@ -64,7 +64,7 @@ export const rename = {
         to: {
           alias: "t",
           describe:
-            "New name of the package. Name must match what is in package.json.",
+            "New name of the package. Name will be written to package.json.",
           demand: true,
         },
         dir: {

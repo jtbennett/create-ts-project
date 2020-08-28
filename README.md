@@ -6,6 +6,8 @@ Create TypeScript monorepo projects with [project references](https://www.typesc
 
 If you have questions or something doesn't "just work", feel free to [submit an issue](https://github.com/jtbennett/create-ts-project/issues/new). You can find me on Twitter [@jtbennett](https://twitter.com/jtbennett).
 
+For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp-commands.md)
+
 ## Quickstart
 
 Create a new project:
@@ -59,8 +61,6 @@ yarn verify:all
 - [Create a project](#create-a-project)
 
 - [Getting started with tsp](#getting-started-with-tsp)
-
-- [`tsp` command details](#tsp-command-details)
 
 - [Yarn scripts](#yarn-scripts)
 
@@ -181,6 +181,8 @@ Your code will go in the `packages` directory.
 
 ## Getting started with `tsp`
 
+_For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp-commands.md)._
+
 `tsp` -- the `ts-project-scripts` CLI -- was installed as a devDependency when you ran the create command above.
 
 `tsp` is used to add packages, which is really just copying a template into the `packages` folder. More importantly, it is used to manage references (dependencies) between packages. It updates the various config files so all the tools work as intended.
@@ -282,202 +284,6 @@ You can stop the dev server (with `Ctrl-C`) and completely delete the `my-server
 
 Of course, you can also delete the entire project and generate a new one.
 
-## `tsp` command details
-
-`tsp` is a CLI that does three things:
-
-- Creates new packages in the `packages` folder, based on templates that integrate with the rest of the configuration.
-
-- Adds and removes references (dependencies) between packages. This involves updates to `package.json`, `tsconfig.json`, `jest` configuration, etc. `tsp` makes these configuration changes for you. And that's _all_ it does when adding and removing reference: update config files.
-
-- Publishes packages to npm. This only happens if you explicitly decide you want it. But if you do, it's a very straightforward process. Configure it once in just a few minutes, and it will then run automatically whenever you push a new version tag to your GitHub repo.
-
-### `--help` option
-
-You can get help for `tsp` in the terminal with:
-
-```bash
-# List all commands:
-yarn tsp --help
-
-# Show help for a specific command:
-yarn tsp <command> --help
-```
-
-### `tsp add <package> --template <template> [--dir <dir-name>]`
-
-Adds a new package to the `packages` directory, based on a template.
-
-If a package will be published under an npm @scope, the @scope must be included in the package name (e.g., `@my-org/my-package`). The package directory will be name of the package _without_ the scope (e.g., `my-package`).
-
-```bash
-yarn tsp add my-package --template node-lib
-# Package will be created at: ./packages/my-package.
-
-yarn tsp add @my-org/my-package --template node-lib
-# Package will be created at: ./packages/my-package.
-```
-
-You can specify a custom directory name using the `--dir` argument:
-
-```bash
-yarn tsp add my-package --template node-lib --dir custom-name
-# Package will be created at: ./packages/custom-name.
-```
-
-#### Included templates
-
-The following templates are included with `tsp`:
-
-- **node-cli.** Use this for command-line interfaces (CLIs).
-
-  The template has a dependency on `yargs` , but you can remove it and use whatever frameworks you like.
-
-  ```bash
-  yarn tsp add my-cli --template my-cli
-
-  # The dev script runs the CLI with no arguments in watch mode:
-  yarn workspace my-cli dev
-
-  # While working on a specific command, pass the appropriate args:
-  yarn workspace my-cli dev foo -bar baz
-  ```
-
-  When you build this template, `chmod +x ./lib/index.js` is run, so that the file can be executed directly, without specifying `node`.
-
-  _Note: `chmod` doesn't exist in Windows dev environments unless you are using WSL. You can remove the `chmod` command from the build script in `package.json`, but then your cli may not work as a standalone executable. I'd love suggestions for how to do this effectively/correctly in Windows._
-
-- **node-lib.** Use this for a library that will be used in a node application.
-
-  ```bash
-  yarn tsp add my-lib --template node-lib
-
-  # The dev script builds in watch mode:
-  yarn workspace my-lib dev
-  ```
-
-  See the [`ref`](#ref) command to add a reference to the library from another library or app package. That will ensure the library is rebuilt as needed.
-
-- **node-server.** Use this for web/api apps. `nodemon` is configured to restart the server when source files change.
-
-  The template has a dependency on `express` , but you can remove it and use whatever frameworks you like.
-
-  ```bash
-  yarn tsp add my-server --template node-server
-
-  # The dev script runs the server in watch mode.
-  yarn workspace my-server dev
-  ```
-
-- **browser-lib.** Use this for a library that will be used in a browser application (e.g., a React app).
-
-  ```bash
-  yarn tsp add my-lib --template browser-lib
-
-  # The dev script builds in watch mode:
-  yarn workspace my-lib dev
-  ```
-
-  See the [`ref`](#ref) command to add a reference to the library from another library or app package. That will ensure the library is rebuilt as needed.
-
-- **create-react-app.** Use this to integrate a React app generated from `create-react-app` with a `create-ts-project` repo.
-
-  This "template" actually runs [create-react-app](https://github.com/facebook/create-react-app) with the `--template typescript` option. It then updates the `tsconfig.json` and `package.json` to integrate with the rest of the repo.
-
-  ```bash
-  yarn tsp add my-app --template create-react-app
-
-  # CRA uses the "start" script to run a dev server.
-  # "dev" was created as an alias by create-ts-project.
-  # You can use either "start" or "dev".
-  yarn workspace my-app dev
-  ```
-
-#### Custom templates
-
-You can create your own templates anywhere in your file system, and use them with the `add` command.
-
-To use a custom template, pass a path **relative to the project root** to the `add` command. For example, if you have a template you want to use for all your express-based web servers:
-
-```bash
-# In this example, `my-templates` is a sibling of the project's root directory.
-yarn tsp add my-package --template ../my-templates/my-express-app
-```
-
-All files in the directory and any subdirectories will be copied. Any directories or files with names beginning with `_tsp_` will have that prefix removed. (This is done to avoid issues when packaging templates for publishing.).
-
-The only change made to file contents is to set the `name` property of `package.json` (or `_tsp_package.json`) to the name givin to the `add` command (e.g., `my-package`).
-
-To work with the rest of the project, your template directory must look like this:
-
-```
-a-template
-├── src
-│   ├── index.test.ts [optional]
-│   └── index.ts [either run your app or export values from here]
-│   [Copy these files from another template]
-├── package.json
-├── tsconfig.json
-└── tsconfig.build.json
-```
-
-### `tsp rename --from <old-name> --to <new-name> [--dir <dir-name>]`
-
-_Docs coming soon..._
-
-Renames a package and updates all references to it.
-
-### `tsp ref --from <from-pkg> --to <to-pkg>`
-
-Adds a reference so that one package in the project can import modules from another package in the project.
-
-```bash
-yarn tsp ref --from my-server --to my-lib
-```
-
-In a .ts file in my-server, you can now write:
-
-```typescript
-import foo from "my-lib";
-```
-
-_Note: After adding a reference from a server package (created from the `node-server` template) to another package, you will need to stop and start the server if it is running with the `dev` script. The `ref` command adds the referenced package to the `nodemon` list of watched files, and `nodemon` must be restarted to pick up the change._
-
-### `tsp unref --from <from-pkg> --to <to-pkg>`
-
-Removes a reference from one package to another.
-
-```bash
-yarn tsp unref --from my-server --to my-lib
-```
-
-To remove all references to a package, use `--all`:
-
-```bash
-yarn tsp unref --all --to my-lib
-```
-
-_Note: This command does **not** delete the package directory. That is left to the developer._
-
-### `tsp dockerfile`
-
-_Docs coming soon..._
-
-Meant to be run during a CI process. Modifies the Dockerfile included in the template so that all the correct files are included for a build, and also for apps that are to be deployed.
-
-### `tsp bundle <pkg-name | --all>`
-
-_Docs coming soon..._
-
-Meant to be run from within the Dockerfile during the CI process. "Bundles" an app for deployment. For apps, moves the build version of all referenced packages (workspaces in the same repo) and all their transitive dependencies that are required under the app node_modules.
-
-### About package and directory names
-
-All `tsp` commands require the package name as it is in `package.json`. If a package will be published under an npm @scope, the @scope must be included in the `tsp` command argument (e.g., `@my-org/my-package`).
-
-The directory containing the package will not include any npm @scope. In the filesystem, the packages `a-package` and `@my-org/another-package` will be in directories `a-package` and `another-package`, respectively.
-
-You can specify a custom directory name when creating a package with the `add` command using the `--dirName` argument. The other commands will locate the package without requiring the custom directory name to be specified.
 
 ## Yarn scripts
 
