@@ -6,56 +6,90 @@ Create TypeScript monorepo projects with [project references](https://www.typesc
 
 If you have questions or something doesn't "just work", feel free to [submit an issue](https://github.com/jtbennett/create-ts-project/issues/new). You can find me on Twitter [@jtbennett](https://twitter.com/jtbennett).
 
-For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp-commands.md)
-
 ## Quickstart
 
-Create a new project:
+- Install [node >=12.0](https://nodejs.org). (_node 10.x and 11.x will work, but require a couple of tweaks._)
+
+- Install [yarn >=1.12, <2.0](https://classic.yarnpkg.com) globally (`npm install -g yarn`).
+
+To create a new project, open a terminal and run:
 
 ```bash
 yarn create @jtbennett/ts-project my-proj
+# or: npx @jtbennett/create-ts-project my-proj
 cd my-proj
 ```
 
-You now have a monorepo ready for development. Open `my-proj` in VS Code or your editor of choice.
+You now have a TypeScript monorepo ready for development, with TypeScript project references and yarn v2 workspaces.
 
-Some example `tsp` commands:
+Open `my-proj` in VS Code or your editor of choice. All the files you see are configured so that yarn, TypeScript, Jest, ESLint and Prettier will work correctly. You can leave them all as-is.
+
+Your code will go in the `./packages` directory.
+
+### About `tsp`
+
+A command line tool called `tsp` is included as a `devDependency` in the root `package.json` file. Use `tsp` to create new packages and to add/remove dependencies between packages in the project. (This is similar to how `react-scripts` is a `devDependency` when you run `create-react-app`.)
+
+You don't have to use `tsp`, but it makes things easier. When you add/remove dependencies between packages in the project, it will update `package.json` and `tsconfig` files so that everything continues to work correctly.
+
+For a simple walk-through with more explanation, see [Getting started with `tsp`](#getting-started-with-tsp) below.
+
+For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp-commands.md)
+
+Example commands to create two packages and a dependency between them.
 
 ```bash
-# Create a library package:
+# Create the packages in ./packages:
 yarn tsp create my-lib --template node-lib
-
-# Create a server app (-t is the same as --template):
 yarn tsp create my-server -t node-server
-# The app is created at ./packages/my-server
 
-# Add to the server a dependency on the library:
-yarn tsp add my-lib --to my-server
+# Add the dependency:
+cd ./packages/my-server
+yarn tsp add my-lib
 
-# Run the server in dev mode:
-yarn workspace my-server dev
+# Run the server:
+yarn dev
 # The server is running at http://localhost:3000
-
 ```
 
-Other useful scripts (see [Yarn scripts](#yarn-scripts) for a full list):
+You can now import modules form `my-lib` into `my-server`:
+
+```typescript
+import foo from "my-lib";
+console.log(foo);
+```
+
+### Other useful yarn scripts
+
+The root `package.json` file includes other scripts you can use. (See [Yarn scripts](#yarn-scripts) for more details.)
 
 ```bash
-# Run tests for just the my-lib package:
-yarn workspace my-lib test
-
-# Run tests for all packages:
+# Scripts that operate on all packages in the project:
+yarn lint:all
 yarn test:all
-
-# Delete build outputs for all packages:
+yarn build:all
 yarn clean:all
 
-# Lint, test and do a clean build all packages:
+# Lint, test, clean and build all packages - useful before committing to git!
 yarn verify:all
 
+# Run a script for a single package:
+yarn workspace my-lib test
+yarn workspace my-lib build
+
+# The node-server and create-react-app templates
+# have a script to start a development server:
+yarn workspace my-server dev
+yarn workspace my-react-app dev
+
+# Set your working directory to a specific package to shorten the commands:
+cd ./packages/my-server
+yarn dev
 ```
 
 ## Contents
+
+In this file:
 
 - [Why?](#why)
 
@@ -63,17 +97,25 @@ yarn verify:all
 
 - [Getting started with tsp](#getting-started-with-tsp)
 
-- [Yarn scripts](#yarn-scripts)
-
 - [Philosophy](#philosophy)
 
 - [Tools included](#tools-included)
 
 - [Alternatives](#alternatives)
 
-- [Contributing](#contributing)
-
 - [License](#license)
+
+Additional documentation:
+
+- [Yarn scripts](./docs/yarn-scripts.md). What each of the included scripts does.
+
+- [`tsp` commands](./docs/tsp-commands.md). Details on all `tsp` commands.
+
+- [Publishing to npm](./docs/publishing-to-npm.md). How to configure the GitHub workflow to publish when you push a new tag to GitHub.
+
+- [Configuration](./docs/configuration.md). How the various config files work.
+
+- [Contributing](./CONTRIBUTING.md)
 
 ## Why?
 
@@ -87,15 +129,15 @@ As a result, these projects are usually monorepos -- multiple packages/apps in t
 
 **_...plus a lot of interdependent tools..._**
 
-A typical project involves configuring TypeScript, jest, eslint, prettier, nodemon, Docker, VS Code, a CI process in GitHub Actions or CircleCI or TravisCI or Jenkins, deployments to Heroku or AWS or Azure or Google Cloud, and sometimes publishing to npm.
+A typical project involves configuring TypeScript, jest, eslint, prettier, nodemon, Docker, VS Code, a CI process (e.g., GitHub Actions, CircleCI, TravisCI, Jenkins), deployments to Heroku or AWS or Azure or Google Cloud, and sometimes publishing to npm.
 
 **_...involves a lot of configuration effort..._**
 
 Separately, each of those tools is straightforward to use.
 
-Getting them all working together in harmony takes effort. For example, we want Jest to be able to find and run our tests, but we don't want test-related files in our build output that will be deployed.
+Getting them all working together in harmony takes effort. For example, we want Jest to be able to find and run our tests, but we don't want test-related files in our build output that will be deployed or published.
 
-Doing it in a monorepo is more effort. For example, yarn workspaces helps save time and disk space by hoisting and sharing dependencies, but how do we deploy an app with just the specific dependencies it needs?
+Doing that in a monorepo is more effort. TypeScript, yarn and jest all use different approaches to resolving packages within the repo.
 
 And keeping them working consistently for all members of a team -- even more effort. For example, does that one person whose linter is using different rules keep breaking the build? Or do semicolons and whitespace make your diffs more difficult to read?
 
@@ -107,7 +149,7 @@ But are you?
 
 - Does your dev server restart when a file in one of its dependencies changes?
 
-- Does TypeScript in your editor know how to resolve types across dependencies so it can highlight errors, offer code completion and navigate source code across packages with "Go to definition (F12)"?
+- Does your editor know how to resolve TypeScript types so it can highlight errors, offer code completion and navigate source code across packages with "Go to definition (F12)"?
 
 - Do the eslint rules that check TypeScript types work across dependencies?
 
@@ -134,7 +176,6 @@ To create a new project, open a terminal and run:
 ```bash
 yarn create @jtbennett/ts-project my-proj
 # or: npx @jtbennett/create-ts-project my-proj
-cd my-proj
 ```
 
 Running that command will create a directory called `my-proj` inside the current folder. Inside that directory, it will generate the initial project structure and install all the tools and other devDependencies.
@@ -161,8 +202,7 @@ my-proj
 │   ├── tsconfig.browser.json
 │   └── tsconfig.node.json
 ├── node_modules
-├── packages
-│   └── about-packages.md
+├── packages   <----- Your code goes here.
 ├── .dockerignore
 ├── .eslintignore
 ├── .eslintrc.js
@@ -186,26 +226,26 @@ _For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp
 
 `tsp` -- the `ts-project-scripts` CLI -- was installed as a devDependency when you ran the create command above.
 
-`tsp` is used to create packages, which is really just copying a template into the `packages` folder. More importantly, it is used to manage references (dependencies) between packages. It updates the various config files so all the tools work as intended.
+`tsp` is used to create packages, which is really just copying a template into the `packages` folder. More importantly, it is used to manage dependencies between packages within the project. It updates the various config files so all the tools work as intended.
 
-A "package" can be a web server, a command-line tool, a standalone library -- pretty much anything written in TypeScript that has a `package.json` file and a `tsconfig.json` file.
+A "package" can be a web server, a React app, a command-line tool, a standalone library -- pretty much anything written in TypeScript that has a `package.json` file and a `tsconfig.json` file.
 
-`tsp` includes some templates, and it's easy to create your own template. Each template contains the scripts, config files, and file structure needed to be ready for development.
+`tsp` includes some templates, and it's easy to create your own templates. Each template contains the scripts, config files, and file structure needed to plug into the rest of the project.
 
-Let's walk through the same steps as listed in the Quickstart above, but with some explanation along the way.
+Let's walk through some of the same commands in the [Quickstart](#Quickstart), but with more explanation along the way.
 
-### Create a node server
+### Create a node library package
 
-Create a node server package:
+This will contain modules that we'll import into other packages.
 
 ```bash
-yarn tsp create my-server --template node-server
+yarn tsp create my-lib --template node-lib
 ```
 
-The package is created at: `./packages/my-server`. It contains these files:
+This will create a directory `./packages/my-lib` that looks like this:
 
 ```
-my-server
+my-lib
 ├── src
 │   ├── index.test.ts
 │   └── index.ts
@@ -214,36 +254,43 @@ my-server
 └── tsconfig.build.json
 ```
 
-Now you can use the scripts included in its `package.json` file to build, test, lint or run the server. Let's run it as you would for development:
+`index.ts` has a default export - a string.
+
+### Create a node server
+
+Create a node server package. This time we'll use the `-t` short version of `--template`.
+
+```bash
+yarn tsp create my-server -t node-server
+```
+
+The package is created at: `./packages/my-server`. It contains a very similar structure as the library package, but the scripts in `package.json` are a little different. They include a `dev` script to run the server with nodemon watching for changes.
 
 ```bash
 yarn workspace my-server dev
 ```
 
-You'll see some messages from `tsc` and `nodemon`, and the output of the server: "MY-SERVER: Hello world". The server is a basic [express](https://expressjs.com) server. You can open your browser to [http://localhost:3000](http://localhost:3000) to see the same message.
+You'll see some messages from `tsc` and `nodemon`, and the "hello world" output. The server is a basic [express](https://expressjs.com) server. You can open your browser to [http://localhost:3000](http://localhost:3000) to see the same message.
 
 If you save a change to `./packages/my-server/src/index.ts`, you'll see the server restart.
 
 _You don't have to use express to use this template. Delete the dependency on express and use whatever web server framework you like. The `dev` script and other configuration is what makes this template suitable for server apps._
 
-### Add a library package
-
-To create another package, use the same command as above, but specify a different template. This time we'll use the shorthand `-t` instead of `--template`. Stop the server with `Ctrl-C` and run:
-
-```bash
-yarn tsp create my-lib -t node-lib
-```
+### Add a dependency between packages
 
 Now let's consume my-lib from my-server.
 
-### Add a reference (dependency) between packages
+This is the conceptual equivalent of running `yarn add` or manually adding a dependency in `package.json`. We'll use `tsp` instead. It updates not only the dependency in `package.json`, but also the nodemon, jest and TypeScript config values.
 
-This is the conceptual equivalent of adding a dependency in `package.json`. `tsp` makes that change for you, as well as making corresponding changes to nodemon, TypeScript and other configs.
-
-You first need to stop the server with `Ctrl-C`. Then, to add the reference and restart the server:
+To add the dependency:
 
 ```bash
-yarn tsp add --from my-server --to my-lib
+# Stop my-server with Ctrl-C.
+
+# Add the reference.
+yarn tsp workspace my-server add my-lib
+
+# Restart the server.
 yarn workspace my-server dev
 ```
 
@@ -265,190 +312,31 @@ Now make a change to the exported string value in `./packages/my-lib/src/index.t
 
 In the dev server, you will see `tsc` recompile, the server restart, and the new message from `my-lib`.
 
-### Remove a reference (dependency) between packages
+### Remove a dependency between packages
 
-This is the conceptual equivalent of removing a dependency in `package.json`. `tsp` does that for you, as well as making corresponding changes to nodemon, TypeScript and other configs.
+This is the conceptual equivalent of running `yarn remove` or manually removing a dependency in `package.json`. Again, `tsp` does that for you, as well as making corresponding changes to nodemon, jest and TypeScript configs.
 
 ```bash
-yarn tsp remove --from my-server --to my-lib
+# Stop my-server with Ctrl-C.
+
+# Remove the reference.
+yarn workspace my-server tsp remove my-lib
+
+# Restart the server.
+yarn workspace my-server dev
 ```
 
-You _should_ see an error in the server, because `./packages/my-server/src/index.ts` still contains an import from `my-lib`, which is no longer referenced.
+You might expect to see an error when the server runs, because `my-server` still contains an import from `my-lib`.
 
-_Unfortunately, you won't actually see an error._ But you _will_ see the linter highlighting the problem in your editor. The linter will also generate an error when it is run at the command line.
+_Unfortunately, you won't actually see an error._ Because of the symlinks created by yarn workspaces, `my-server` can still resolve `my-lib`. The good news is that ESLint knows that you no longer have the dependency in `package.json` and will highlighting the problem in your editor. The linter will also generate an error when it is run at the command line.
 
 ### Cleaning up
 
-You can stop the dev server (with `Ctrl-C`) and completely delete the `my-server` and `my-lib` directories. You will need to rerun `yarn` after deleting them, so that it knows that those workspaces no longer exist.
+You can stop the dev server (`Ctrl-C`) and completely delete the `my-server` and `my-lib` directories. You will need to rerun `yarn` after deleting them, so that it knows that those workspaces no longer exist.
 
-`tsp` does not make any changes outside of the individual package directories, and never deletes files or directories.
+`tsp` does not make changes outside of the individual package directories, and never deletes files or directories.
 
-Of course, you can also delete the entire project and generate a new one.
-
-
-## Yarn scripts
-
-This document describes the `yarn` scripts available in the root `package.json` of a project generated with `create-ts-project`, as well as in the package templates used by `tsp` (`ts-project-scripts`).
-
-### Root-level scripts
-
-When you create a project with `create-ts-project`, a number of scripts are included in the root-level `package.json` file. You can run these with `yarn [script name]`. The current working directory must be inside the project, but _outside_ any package directories.
-
-Most of the root-level scripts are simply shortcuts to run the similarly named script in each package/workspace. For example, the root-level `verify:all` script runs the `verify` script in each package/workspace.
-
-_Each package directory is a yarn workspace. See [yarn config](./configuration#yarn) for more info._
-
-The root-level scripts that simply all the corresponding script in each package/workspace are:
-
-- `lint:all`
-- `test:all`
-- `clean:all`
-- `build:all`
-- `verify:all`
-- `purge:all`
-
-For details on what each script actually does, see [Package-level scripts](#package-level-scripts) below.
-
-_Note: **The corresponding scripts must exist in all packages** or yarn will exit with an error. If you don't want a package-level script to do anything, you can make its value `echo`._
-
-In addition, there are two root-level scripts that don't have an equivalent at the package level:
-
-- **`version:all <version>`**
-
-  The version argument should be a valid npm version number like `1.2.3` or `2.0.0-beta.1`.
-
-  This script is helpful when publishing packages to npm. It does three things:
-
-  - Sets the version property in all `package.json` files (including the root) to the specified version.
-  - Commits those changes to your repo.
-  - Creates a tag in the form: `v1.2.3`.
-
-- **`tsp`**
-
-  A shortcut to run `tsp`. This means in the project root, you can run `yarn tsp <command> [options]` instead of `./node_modules/.bin/tsp <command> [options]`.
-
-### Package-level scripts
-
-All templates include the same set of scripts.
-
-The `dev` and `build` scripts are different in each package template, because the appropriate action depends on the type of package.
-
-- **`dev`**
-
-  - **node-server**
-
-    Uses `concurrently` to simultaneously:
-
-    - Build the server in watch mode.
-
-    - Run the server in `nodemon`. `nodemon` restarts `node` on each file change. See the `nodemonConfig` property of `package.json` for the exact config.
-
-  - **node-cli**
-
-    Builds and runs the CLI entry point script. Any parameters passed to dev are forwarded to the CLI.
-
-    ```bash
-    # This will pass 'foo --bar baz' to your CLI entry point.
-    yarn dev foo --bar baz
-    ```
-
-  - **node-lib**
-
-    Builds the library in watch mode, so it rebuilds on each file change.
-
-    _Note: Libraries are automatically built by the projects that reference them and rebuilt when files change (in watch mode). You won't typically run the `dev` script for a library._
-
-- **`build`**
-
-  - **node-server** - Builds the package.
-
-  - **node-cli** - Builds the package and sets the entry point file to be executable (with `chmod`).
-
-  - **node-lib** - Builds the package.
-
-The remaining scripts are the same in all package templates:
-
-- **`lint`**
-
-  Lints the package with eslint. Warnings will be displayed, but do not cause linting to fail.
-
-  _Because we use eslint rules that perform TypeScript type checks, linting a package that references other packages requires that the packages be built first. See [eslint config](./confiuguration.md#eslint) for more info._
-
-- **`test`**
-
-  Runs all tests in the package with jest. Add the `--coverage` option to generate a test coverage report.
-
-- **`clean`**
-
-  Deletes all build outputs for the package. See [TypeScript config](./configuration#typescript) for more info.
-
-- **`verify`**
-
-  Runs test, clean, build, and lint scripts, as described above. The only difference is that `verify` tells eslint to fail if there are any warnings.
-
-- **`purge`**
-
-  Runs the `clean` script to delete build outputs, and also deletes the package's `node_modules` and `coverage` folders.
-
-## Publishing packages to npm
-
-### One-time setup for publishing
-
-The [`.github/workflows/build.yml`](./.github/workflows/build.yml) file contains commented-out tasks that can publish your packages to npm automatically when you push a new git tag to github.
-
-_Note: This setup only supports the case where all packages have the same version number._
-
-To automate publishing of your packages:
-
-- Add a secret to your github repo named `NPM_TOKEN` with a valid token for publishing to npm.
-
-- Remove "private: true" from the package.json files of the packages you wish to publish. Fill out other metadata fields like license, author, description, etc.
-
-- In [`.github/workflows/build.yml`](./.github/workflows/build.yml):
-
-  - Uncomment the `Set publish version from tag` and `Publish` steps.
-
-  - Under the `Publish` step, remove "--access public" if your package will not be public.
-
-  - Replace `__PACKAGE_X__` with the name of a package you want to publish. (Include the @scope, if any.)
-
-  - Duplicate the `yarn workspace ... npm publish ...` line for any additional packages you want to publish.
-
-### Publish a new version
-
-The package(s) will be published to npm when a tag like `v1.2.3` is pushed to github. (Where `1.2.3` is any valid npm version number.)
-
-**Be sure the version in each package.json matches the tag value!**
-
-The `version:all` yarn script (described above) will keep everything in sync for you:
-
-```bash
-yarn version:all 1.2.3
-```
-
-That script will:
-
-- Set the version in package.json for all packages (including the root) to `1.2.3`.
-
-- Commit those changes to your local copy of the repo.
-
-- Tag the commit with `v1.2.3`.
-
-Kick off a publish by pushing the tag to your github repo:
-
-```bash
-git push --follow-tags
-```
-
-If your build succeeds, the package(s) will be published to npm!
-
-## VS Code tasks
-
-All of the root-level yarn scripts are also available as VS Code tasks. When you choose Run Tasks, you will see them listed.
-
-In addition, the `tsp create`, `tsp add` and `tsp remove` commands are also available as tasks. These will prompt you to input package names and provides a drop-down for selecting a template for `tsp create`.
-
-I recommend that you also create a task to run each server in your repo in dev mode. A sample is included in the `./.vscode/tasks.json` file. Uncomment it and simply replace `my-server` with the directory name of your server package.
+Now you can start adding your actual packages. Enjoy!
 
 ## Philosophy
 
@@ -483,6 +371,8 @@ The more of those tools that you use, the more useful CTSP may be, but most can 
 ## Alternatives
 
 A million boilerplate repos and create-\* scripts are out there. You may find others more to your liking. This one is set up the way I like to work. I'll be thrilled if someone else finds it helpful.
+
+The [RomeJS](https://romefrontend.dev/) and [Deno](https://deno.land/) projects are also addressing some of the same pain points. They each take the approach of building their own integrated set of tools: TypeScript compiler, linter, formatter, bundler, etc. I'm looking forward to using them, but they are each in the early stages of development.
 
 ## License
 
