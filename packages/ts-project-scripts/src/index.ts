@@ -16,7 +16,7 @@ import { bundle } from "./commands/bundle";
 (yargs as yargs.Argv<CliOptions>)
   .version(false)
   .scriptName("tsp")
-  .usage("Usage: $0 <command> [options]")
+  .usage("Usage: $0 <command> [options] [--help]")
 
   .middleware((argv) => {
     setVerbose(!!argv.verbose);
@@ -39,4 +39,4 @@ import { bundle } from "./commands/bundle";
   .epilog(
     "More information available at:\nhttps://github.com/jtbennett/create-ts-project",
   )
-  .wrap(Math.min(90, yargs.terminalWidth())).argv;
+  .wrap(Math.min(120, yargs.terminalWidth())).argv;

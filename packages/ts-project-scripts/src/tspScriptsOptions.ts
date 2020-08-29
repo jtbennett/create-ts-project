@@ -11,5 +11,5 @@ export const tspScriptsOptions: { [key: string]: Options } = {
     boolean: true,
     describe: "Run yarn after the command completes. Disable with --no-yarn.",
     default: true
-  },
+  }
 };

@@ -1,3 +1,5 @@
+import { execSync } from "child_process";
+import { resolve } from "path";
 import { Argv } from "yargs";
 
 import {
@@ -10,39 +12,40 @@ import {
 import { tspHandler } from "../tspHandler";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
-import { execSync } from "child_process";
+import { getPaths } from "../paths";
 
 const handler = tspHandler<
   TspScriptsOptions & {
-    from: string;
-    to: string;
+    newPkgName: string;
     dir?: string;
+    cwd?: string;
   }
 >((args) => {
   const all = Package.loadAll();
-  const fromPkg = all.find(
-    (pkg) => pkg.packageJson && pkg.packageJson.name === args.from,
-  );
-  const toPkg = all.find(
-    (pkg) => pkg.packageJson && pkg.packageJson.name === args.to,
-  );
 
-  if (!fromPkg) {
-    throw new PackageNotFoundError(args.from);
+  const cwd = args.cwd ? resolve(getPaths().rootPath, args.cwd) : process.cwd();
+  const currentPkg = all.find((pkg) => pkg.path === cwd);
+
+  if (!currentPkg) {
+    throw new PackageNotFoundError(cwd);
   }
+
+  const toPkg = all.find(
+    (pkg) => pkg.packageJson && pkg.packageJson.name === args.newPkgName,
+  );
 
   if (toPkg) {
     throw new CliError(
-      `Package "${args.to}" already exists. Choose a different name.`,
+      `Package "${args.newPkgName}" already exists. Choose a different name.`,
     );
   }
 
-  fromPkg.rename(args.to, args.dir);
+  currentPkg.rename(args.newPkgName, args.dir);
 
   if (args.yarn) {
     args.yarn = false;
     execSync("yarnpkg install", { stdio: "inherit" });
-    execSync("yarnpkg workspaces run clean", { stdio: "inherit" });
+    execSync("yarnpkg run clean:all", { stdio: "inherit" });
   } else {
     log.warn(
       "You must run 'yarn' and 'yarn clean:all' or references will not work correctly.",
@@ -51,28 +54,26 @@ const handler = tspHandler<
 });
 
 export const rename = {
-  command: "rename",
-  describe: "Add a reference (dependency) from one package to another",
+  command: "rename <new-pkg-name>",
+  describe: "Rename the current package",
 
   builder: (yargs: Argv) =>
     yargs
-      .usage("Usage: $0 rename --from <from> --to <to> [--dir <dir>]")
+      .usage("Usage: $0 rename <new-pkg-name> [--dir <dir>] [--cwd <cwd>]")
+      .positional("pkg-name", {
+        describe: "New name of the package. Will be written to package.json.",
+        type: "string",
+      })
       .options({
-        from: {
-          alias: "f",
-          describe: "Name of the package to be renamed.",
-          demand: true,
-        },
-        to: {
-          alias: "t",
-          describe: "New name of the package. Will be written to package.json.",
-          demand: true,
-        },
         dir: {
           alias: "d",
           describe:
-            "Name of the directory, if different from the new package name. " +
+            "Name of the new directory, if different from the new package name. " +
             'By default an npm scope like "@myorg/" is not included in the directory name.',
+        },
+        cwd: {
+          describe:
+            "Rename the package in --cwd, instead of the actual current working directory.",
         },
         ...cliOptions,
         ...tspScriptsOptions,

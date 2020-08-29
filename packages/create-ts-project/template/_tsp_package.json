@@ -15,6 +15,7 @@
     "verify:all": "yarn lint:all --max-warnings 0 && yarn test:all && yarn clean:all && yarn build:all",
     "version:all": "yarn workspaces foreach version $0 && git commit -am \"v$0\" && git tag -a \"v$0\" -m \"v$0\"",
     "purge:all": "yarn workspaces foreach run purge && rimraf './node_modules'",
+    "tsp:root": "tsp",
     "tsp": "tsp"
   },
   "devDependencies": {

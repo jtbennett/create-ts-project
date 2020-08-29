@@ -1,3 +1,4 @@
+import { resolve } from "path";
 import { Argv } from "yargs";
 
 import {
@@ -8,11 +9,12 @@ import {
 import { tspHandler } from "../tspHandler";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
+import { getPaths } from "../paths";
 
 const handler = tspHandler<
   TspScriptsOptions & {
     pkgName: string;
-    to: string;
+    cwd?: string;
   }
 >((args) => {
   const all = Package.loadAll();
@@ -21,38 +23,35 @@ const handler = tspHandler<
     (pkg) => pkg.packageJson && pkg.packageJson.name === args.pkgName,
   );
 
-  const toPkg = all.find(
-    (pkg) => pkg.packageJson && pkg.packageJson.name === args.to,
-  );
-
   if (!dependency) {
     throw new PackageNotFoundError(args.pkgName);
   }
 
+  const cwd = args.cwd ? resolve(getPaths().rootPath, args.cwd) : process.cwd();
+  const toPkg = all.find((pkg) => pkg.path === cwd);
+
   if (!toPkg) {
-    throw new PackageNotFoundError(args.to);
+    throw new PackageNotFoundError(cwd);
   }
 
   toPkg.addDependency(dependency);
 });
 
 export const add = {
-  command: "add",
-  describe: "Add a dependency from one package to another",
+  command: "add <pkg-name>",
+  describe: "Add a dependency to the current package",
 
   builder: (yargs: Argv) =>
     yargs
-      .usage("Usage: $0 add <pkg-name> --to <to>")
+      .usage("Usage: $0 add <pkg-name> [--cwd <cwd>]")
       .positional("pkg-name", {
         desc: "Name of the dependency to add.",
         type: "string",
       })
       .options({
-        to: {
-          alias: "t",
+        cwd: {
           describe:
-            "Name of the package to which the dependency will be added.",
-          demand: true,
+            "Add the dependency to the package in --cwd, instead of the actual current working directory.",
         },
         ...cliOptions,
         ...tspScriptsOptions,

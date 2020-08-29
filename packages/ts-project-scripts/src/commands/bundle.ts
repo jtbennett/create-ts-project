@@ -171,7 +171,7 @@ const handler = tspHandler<
 });
 
 export const bundle = {
-  command: "bundle [pkg-name]",
+  command: "bundle [pkg-name] [--all]",
   describe:
     "Prepare an app for deployment by moving refs under its node_modules. ",
 

@@ -35,7 +35,7 @@ const handler = tspHandler<
 
 export const list = {
   command: "list",
-  describe: "List all packages and their references",
+  describe: "List all packages and their references within the project",
 
   builder: (yargs: Argv) =>
     yargs.usage("Usage: $0 list").options({

@@ -126,6 +126,7 @@ export class Package {
       }
     }
 
+    this.packageJson.dependencies = this.packageJson.dependencies || {};
     const { dependencies } = this.packageJson;
     if (!dependencies[dependency.name]) {
       dependencies[dependency.name] = "workspace:*";
@@ -141,7 +142,7 @@ export class Package {
       }
     }
 
-    const watch = this.packageJson?.nodemonConfig?.watch;
+    const watch = this.packageJson.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
         path.endsWith(`/${dependency.dir}/${this.libDir}`),
@@ -171,6 +172,7 @@ export class Package {
       }
     }
 
+    this.packageJson.dependencies = this.packageJson.dependencies || {};
     const { dependencies } = this.packageJson;
     if (dependencies[dependency.name]) {
       removed = true;
@@ -183,7 +185,7 @@ export class Package {
       delete jest.moduleNameMapper[dependency.name];
     }
 
-    const watch = this.packageJson?.nodemonConfig?.watch;
+    const watch = this.packageJson.nodemonConfig?.watch;
     if (watch) {
       const index = watch.findIndex((path) =>
         path.endsWith(`/${dependency.dir}/${this.libDir}`),

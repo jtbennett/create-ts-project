@@ -21,7 +21,8 @@
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build ./tsconfig.build.json",
     "verify": "yarn lint --max-warnings 0 && yarn test && yarn clean && yarn build",
-    "purge": "yarn clean && rimraf ./coverage ./node_modules"
+    "purge": "yarn clean && rimraf ./coverage ./node_modules",
+    "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)"
   },
   "nodemonConfig": {
     "exec": "node ./lib/index.js",

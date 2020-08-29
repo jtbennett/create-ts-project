@@ -11,7 +11,9 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
     "dev": "yarn build --watch --preserveWatchOutput",
     "lint": "eslint ./src --ext .ts --env node",
@@ -19,14 +21,16 @@
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build ./tsconfig.build.json",
     "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
-    "purge": "yarn clean && rimraf ./coverage ./node_modules"
+    "purge": "yarn clean && rimraf ./coverage ./node_modules",
+    "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)"
   },
   "dependencies": {},
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "testMatch": ["<rootDir>/src/**/*.test.ts"]
+    "testMatch": [
+      "<rootDir>/src/**/*.test.ts"
+    ]
   }
 }

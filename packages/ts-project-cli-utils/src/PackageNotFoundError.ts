@@ -1,9 +1,10 @@
 import { CliError } from "./CliError";
 
 export class PackageNotFoundError extends CliError {
-  constructor(pkgName: string) {
+  constructor(pkgNameOrPath: string) {
     super(
-      `Package "${pkgName}" was not found. The value must match the "name" property in package.json.`,
+      `Package "${pkgNameOrPath}" was not found. ` +
+        `When specifying a name, it must match the "name" property in package.json.`,
     );
   }
 }

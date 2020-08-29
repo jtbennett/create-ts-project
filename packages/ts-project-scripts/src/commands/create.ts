@@ -30,11 +30,11 @@ const handler = tspHandler<
 
 export const create = {
   command: "create <pkg-name>",
-  describe: "Create a package based on a template",
+  describe: "Create a new package based on a template",
 
   builder: (yargs: Argv) =>
     yargs
-      .usage("Usage: $0 create <pkg-name> -t <template>")
+      .usage("Usage: $0 create <pkg-name> --template <template> [--dir <dir>]")
 
       .positional("pkg-name", {
         desc:
@@ -51,7 +51,7 @@ export const create = {
         dir: {
           alias: "d",
           describe:
-            "Name of the directory, if different from the package name. " +
+            "Name of the directory to create, if different from the package name. " +
             'By default an npm scope like "@myorg/" is not included in the directory name.',
         },
         ...cliOptions,

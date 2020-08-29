@@ -1,8 +1,8 @@
+import { resolve } from "path";
 import { Argv } from "yargs";
 
 import {
   cliOptions,
-  CliError,
   log,
   PackageNotFoundError,
 } from "@jtbennett/ts-project-cli-utils";
@@ -10,17 +10,15 @@ import {
 import { tspHandler } from "../tspHandler";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { Package } from "../Package";
+import { getPaths } from "../paths";
 
 const handler = tspHandler<
   TspScriptsOptions & {
     pkgName: string;
-    from?: string;
     all?: boolean;
+    cwd?: string;
   }
 >((args) => {
-  if (!args.from && !args.all) {
-    throw new CliError(`Either the --from or --all argument must be provided.`);
-  }
   const all = Package.loadAll();
 
   const dependency = all.find(
@@ -31,14 +29,15 @@ const handler = tspHandler<
     throw new PackageNotFoundError(args.pkgName);
   }
 
+  const cwd = args.cwd ? resolve(getPaths().rootPath, args.cwd) : process.cwd();
   const fromPackages = args.all
-    ? all.filter((pkg) => pkg.packageJson && pkg.packageJson.name !== args.to)
-    : all.filter(
-        (pkg) => pkg.packageJson && pkg.packageJson.name === args.from,
-      );
+    ? all.filter(
+        (pkg) => pkg.packageJson && pkg.packageJson.name !== args.pkgName,
+      )
+    : all.filter((pkg) => pkg.path === cwd);
 
-  if (args.from && fromPackages.length === 0) {
-    throw new PackageNotFoundError(args.from);
+  if (!args.all && fromPackages.length === 0) {
+    throw new PackageNotFoundError(cwd);
   }
 
   if (fromPackages.length === 0) {
@@ -53,26 +52,24 @@ const handler = tspHandler<
 });
 
 export const remove = {
-  command: "remove",
-  describe: "Remove a reference (dependency) from one package to another",
+  command: "remove <pkg-name>",
+  describe: "Remove a dependency from the current package",
 
   builder: (yargs: Argv) =>
     yargs
-      .usage("Usage: $0 remove <pkg-name> --from <from>")
+      .usage("Usage: $0 remove <pkg-name> [--all] [--cwd <cwd>]")
       .positional("pkg-name", {
         desc: "Name of the dependency to remove.",
         type: "string",
       })
       .options({
-        from: {
-          alias: "f",
-          describe:
-            "Name of the package from which the dependency is being removed.",
-        },
         all: {
           alias: "a",
+          describe: "Remove the dependency from all other packages.",
+        },
+        cwd: {
           describe:
-            "Remove dependencies on the package from all other packages. --from is ignored.",
+            "Remove the dependency from the package in --cwd, instead of the actual current working directory.",
         },
         ...cliOptions,
         ...tspScriptsOptions,
