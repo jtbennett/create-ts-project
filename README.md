@@ -6,6 +6,36 @@ Create TypeScript monorepo projects with [project references](https://www.typesc
 
 If you have questions or something doesn't "just work", feel free to [submit an issue](https://github.com/jtbennett/create-ts-project/issues/new). You can find me on Twitter [@jtbennett](https://twitter.com/jtbennett).
 
+## Contents
+
+In this file:
+
+- [Quickstart](#quickstart)
+
+- [Why?](#why)
+
+- [Getting started](#getting-started)
+
+- [Philosophy](#philosophy)
+
+- [Tools included](#tools-included)
+
+- [Alternatives](#alternatives)
+
+- [License](#license)
+
+Additional documentation:
+
+- [Yarn scripts](./docs/yarn-scripts.md). What each of the included scripts does.
+
+- [`tsp` commands](./docs/tsp-commands.md). Details on all `tsp` commands.
+
+- [Publishing to npm](./docs/publishing-to-npm.md). How to configure the GitHub workflow to publish when you push a new tag to GitHub.
+
+- [Configuration](./docs/configuration.md). How the various config files work.
+
+- [Contributing](./CONTRIBUTING.md)
+
 ## Quickstart
 
 - Install [node >=12.0](https://nodejs.org). (_node 10.x and 11.x will work, but require a couple of tweaks._)
@@ -32,7 +62,7 @@ A command line tool called `tsp` is included as a `devDependency` in the root `p
 
 You don't have to use `tsp`, but it makes things easier. When you add/remove dependencies between packages in the project, it will update `package.json` and `tsconfig` files so that everything continues to work correctly.
 
-For a simple walk-through with more explanation, see [Getting started with `tsp`](#getting-started-with-tsp) below.
+For a simple walk-through with more explanation, see [Using `tsp`](#using-tsp) below.
 
 For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp-commands.md)
 
@@ -87,36 +117,6 @@ cd ./packages/my-server
 yarn dev
 ```
 
-## Contents
-
-In this file:
-
-- [Why?](#why)
-
-- [Create a project](#create-a-project)
-
-- [Getting started with tsp](#getting-started-with-tsp)
-
-- [Philosophy](#philosophy)
-
-- [Tools included](#tools-included)
-
-- [Alternatives](#alternatives)
-
-- [License](#license)
-
-Additional documentation:
-
-- [Yarn scripts](./docs/yarn-scripts.md). What each of the included scripts does.
-
-- [`tsp` commands](./docs/tsp-commands.md). Details on all `tsp` commands.
-
-- [Publishing to npm](./docs/publishing-to-npm.md). How to configure the GitHub workflow to publish when you push a new tag to GitHub.
-
-- [Configuration](./docs/configuration.md). How the various config files work.
-
-- [Contributing](./CONTRIBUTING.md)
-
 ## Why?
 
 **_A monorepo..._**
@@ -161,7 +161,9 @@ But are you?
 
 I'd like everyone on the team to have all that "just work", so we can focus on the actual thing we're trying to build. That's the goal for Create Typescript Project.
 
-## Create a project
+## Getting started
+
+### Create a project
 
 _It is not recommended to install the `create-ts-project` package. Instead, use `yarn create` or `npx` to run it as a command._
 
@@ -220,7 +222,7 @@ You shouldn't need to make any configuration changes. But if you'd like to know 
 
 Your code will go in the `packages` directory.
 
-## Getting started with `tsp`
+### Using `tsp`
 
 _For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp-commands.md)._
 
@@ -234,7 +236,7 @@ A "package" can be a web server, a React app, a command-line tool, a standalone 
 
 Let's walk through some of the same commands in the [Quickstart](#Quickstart), but with more explanation along the way.
 
-### Create a node library package
+#### Create a node library package
 
 This will contain modules that we'll import into other packages.
 
@@ -256,7 +258,7 @@ my-lib
 
 `index.ts` has a default export - a string.
 
-### Create a node server
+#### Create a node server
 
 Create a node server package. This time we'll use the `-t` short version of `--template`.
 
@@ -276,7 +278,7 @@ If you save a change to `./packages/my-server/src/index.ts`, you'll see the serv
 
 _You don't have to use express to use this template. Delete the dependency on express and use whatever web server framework you like. The `dev` script and other configuration is what makes this template suitable for server apps._
 
-### Add a dependency between packages
+#### Add a dependency between packages
 
 Now let's consume my-lib from my-server.
 
@@ -312,7 +314,7 @@ Now make a change to the exported string value in `./packages/my-lib/src/index.t
 
 In the dev server, you will see `tsc` recompile, the server restart, and the new message from `my-lib`.
 
-### Remove a dependency between packages
+#### Remove a dependency between packages
 
 This is the conceptual equivalent of running `yarn remove` or manually removing a dependency in `package.json`. Again, `tsp` does that for you, as well as making corresponding changes to nodemon, jest and TypeScript configs.
 
@@ -330,7 +332,7 @@ You might expect to see an error when the server runs, because `my-server` still
 
 _Unfortunately, you won't actually see an error._ Because of the symlinks created by yarn workspaces, `my-server` can still resolve `my-lib`. The good news is that ESLint knows that you no longer have the dependency in `package.json` and will highlighting the problem in your editor. The linter will also generate an error when it is run at the command line.
 
-### Cleaning up
+#### Cleaning up
 
 You can stop the dev server (`Ctrl-C`) and completely delete the `my-server` and `my-lib` directories. You will need to rerun `yarn` after deleting them, so that it knows that those workspaces no longer exist.
 
