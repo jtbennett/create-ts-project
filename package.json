@@ -2,7 +2,7 @@
   "name": "@jtbennett/ts-project",
   "author": "John Bennett",
   "private": true,
-  "version": "1.0.0-beta24",
+  "version": "1.0.0-rc.1",
   "workspaces": {
     "packages": [
       "packages/*"

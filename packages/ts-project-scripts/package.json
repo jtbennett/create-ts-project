@@ -1,6 +1,6 @@
 {
   "name": "@jtbennett/ts-project-scripts",
-  "version": "1.0.0-beta24",
+  "version": "1.0.0-rc.1",
   "keywords": [
     "typescript",
     "monorepo",
