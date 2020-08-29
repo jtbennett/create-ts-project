@@ -1,6 +1,11 @@
 import { Argv } from "yargs";
 
-import { cliOptions, CliError, log } from "@jtbennett/ts-project-cli-utils";
+import {
+  cliOptions,
+  CliError,
+  log,
+  PackageNotFoundError,
+} from "@jtbennett/ts-project-cli-utils";
 
 import { tspHandler } from "../tspHandler";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
@@ -23,9 +28,7 @@ const handler = tspHandler<
   );
 
   if (!fromPkg) {
-    throw new CliError(
-      `Package "${args.from}" was not found. The value must match the "name" property in package.json.`,
-    );
+    throw new PackageNotFoundError(args.from);
   }
 
   if (toPkg) {
@@ -57,14 +60,12 @@ export const rename = {
       .options({
         from: {
           alias: "f",
-          describe:
-            "Name of the package to be renamed. Name must match what is in package.json.",
+          describe: "Name of the package to be renamed.",
           demand: true,
         },
         to: {
           alias: "t",
-          describe:
-            "New name of the package. Name will be written to package.json.",
+          describe: "New name of the package. Will be written to package.json.",
           demand: true,
         },
         dir: {

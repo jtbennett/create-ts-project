@@ -28,15 +28,7 @@ const handler = tspHandler<
     log.success(`\n${pkg.name}`);
     refs.forEach((r) => {
       const dep = pkg.packageJson?.dependencies[r.name];
-      const watch = pkg.packageJson?.nodemonConfig?.watch.find((path) =>
-        path.includes(`/${r.dir}/`),
-      );
-
-      log.info(`  -> ${r.name}`);
-      log.info(`      dependency version: ${dep}`);
-      if (pkg.packageJson && pkg.packageJson.nodemonConfig) {
-        log.info(`      nodemon watch: ${watch}`);
-      }
+      log.info(`  -> ${r.name}@${dep}`);
     });
   });
 });

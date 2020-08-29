@@ -99,7 +99,7 @@ export class Package {
     this.packageJson.version = value;
   }
 
-  loadReferences() {
+  loadDependencies() {
     const keys = Object.keys(this.tsconfigs);
     this.tsconfigs[keys[0]].references =
       this.tsconfigs[keys[0]].references || [];
@@ -111,7 +111,7 @@ export class Package {
     });
   }
 
-  addReferenceTo(dependency: Package) {
+  addDependency(dependency: Package) {
     for (const key in this.tsconfigs) {
       this.tsconfigs[key].references = this.tsconfigs[key].references || [];
       const references = this.tsconfigs[key].references;
@@ -154,7 +154,7 @@ export class Package {
     this.saveChanges();
   }
 
-  removeReferenceTo(dependency: Package) {
+  removeDependency(dependency: Package) {
     let removed = false;
 
     for (const key in this.tsconfigs) {
@@ -210,9 +210,9 @@ export class Package {
     });
 
     Package.loadAll().forEach((pkg) => {
-      const removed = pkg.removeReferenceTo(this);
+      const removed = pkg.removeDependency(this);
       if (removed) {
-        pkg.addReferenceTo(newPkg);
+        pkg.addDependency(newPkg);
       }
     });
 

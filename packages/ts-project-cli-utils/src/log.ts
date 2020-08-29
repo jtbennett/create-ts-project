@@ -1,4 +1,5 @@
 import { gray, green, yellow, red } from "chalk";
+import { CliError } from "./CliError";
 
 let verbose = false;
 
@@ -18,10 +19,10 @@ export const log = {
   error: (message: string) => console.log(red(`ERROR: ${message}`)),
 };
 
-export const logAndExit = (error: Error, suppressStackTrace = false) => {
-  if (!suppressStackTrace) {
-    console.log(error);
-  }
-  log.error(error.message);
+export const logAndExit = (error: Error) => {
+  const message =
+    error instanceof CliError ? error.message : error.stack || error.message;
+  log.error(message);
+  
   process.exit(1);
 };

@@ -18,7 +18,7 @@ const tsconfigContents = {
   exclude: ["src/jest", "src/**/*.test.ts", "src/**/__mocks__"],
 };
 
-export const addCreateReactApp = (
+export const createReactApp = (
   args: TspScriptsOptions & {
     pkgName: string;
     dir?: string;

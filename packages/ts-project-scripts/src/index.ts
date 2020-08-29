@@ -5,10 +5,10 @@ import * as yargs from "yargs";
 import { CliOptions, log, setVerbose } from "@jtbennett/ts-project-cli-utils";
 
 import { list } from "./commands/list";
-import { add } from "./commands/add";
+import { create } from "./commands/create";
 import { rename } from "./commands/rename";
-import { ref } from "./commands/ref";
-import { unref } from "./commands/unref";
+import { add } from "./commands/add";
+import { remove } from "./commands/remove";
 
 import { dockerfile } from "./commands/update-dockerfile";
 import { bundle } from "./commands/bundle";
@@ -26,10 +26,10 @@ import { bundle } from "./commands/bundle";
   })
 
   .command(list as any)
-  .command(add as any)
+  .command(create as any)
   .command(rename as any)
-  .command(ref as any)
-  .command(unref as any)
+  .command(add as any)
+  .command(remove as any)
 
   .command(dockerfile as any)
   .command(bundle as any)

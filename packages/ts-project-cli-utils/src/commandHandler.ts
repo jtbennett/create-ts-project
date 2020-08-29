@@ -1,4 +1,3 @@
-import { CliError } from "./CliError";
 import { CliOptions } from "./cliOptions";
 import { log, logAndExit } from "./log";
 import { Arguments } from "yargs";
@@ -14,6 +13,6 @@ export const commandHandler = <TArgs extends CliOptions>(
   try {
     return commandFunc(args);
   } catch (err) {
-    logAndExit(err, err.name === new CliError("").name);
+    logAndExit(err);
   }
 };

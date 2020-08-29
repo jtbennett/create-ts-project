@@ -4,4 +4,5 @@ export { commandHandler } from "./commandHandler";
 export { Files, getFiles } from "./files";
 export { log, logAndExit, setVerbose } from "./log";
 export { PackageJson } from "./PackageJson";
+export { PackageNotFoundError } from "./PackageNotFoundError";
 export { Tsconfig } from "./Tsconfig";

@@ -139,7 +139,7 @@ A TypeScript project reference is specified in the `tsconfig.json` of the refere
 
 For an editor like VS Code to be able to resolve types -- in order to provide intellisense, linting, etc. -- we also need include a value in `compilerOptions.paths` for each referenced package.
 
-`tsp ref` and `tsp unref` manage these changes to `tsconfig.json` for you.
+`tsp add` and `tsp remove` manage these changes to `tsconfig.json` for you.
 
 See the [project references documentation](https://www.typescriptlang.org/docs/handbook/project-references.html) for more info.
 
@@ -166,7 +166,7 @@ The initial config looks like this:
 }
 ```
 
-`tsp ref` and `tsp unref` modify the `watch` value for you, so that a change to a source file in a dependency will cause the server to restart.
+`tsp add` and `tsp remove` modify the `watch` value for you, so that a change to a source file in a dependency will cause the server to restart.
 
 ## jest
 

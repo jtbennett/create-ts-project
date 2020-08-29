@@ -7,36 +7,36 @@
   "options": { "cwd": "${workspaceFolder}" },
   "inputs": [
     {
-      "id": "packageName",
+      "id": "createPackageName",
       "type": "promptString",
       "description": "What is the name of the package to create?"
     },
     {
-      "id": "template",
+      "id": "createTemplate",
       "type": "pickString",
       "description": "Which template should the package be created with?",
-      "options": ["node-lib", "node-cli", "node-server"],
+      "options": ["node-lib", "node-cli", "node-server", "browser-lib"],
       "default": "node-lib"
     },
     {
-      "id": "refFrom",
+      "id": "addPackageName",
       "type": "promptString",
-      "description": "Which package are you creating the reference FROM?"
+      "description": "What is the name of the dependency you are adding?"
     },
     {
-      "id": "refTo",
+      "id": "addTo",
       "type": "promptString",
-      "description": "Which package are you creating the reference TO?"
+      "description": "To which package are you adding the dependency?"
     },
     {
-      "id": "unrefFrom",
+      "id": "removePackageName",
       "type": "promptString",
-      "description": "Which package are you removing the reference FROM?"
+      "description": "What is the name of the dependency you are removing?"
     },
     {
-      "id": "unrefTo",
+      "id": "removeFrom",
       "type": "promptString",
-      "description": "Which package are you removing the reference TO?"
+      "description": "From which package are you removing the dependency?"
     }
   ],
   "tasks": [
@@ -47,16 +47,16 @@
     //   "command": "yarn workspace my-server dev"
     // },
     {
-      "label": "Add a new package",
-      "command": "yarn tsp:dev add ${input:packageName} --template ${input:template}"
+      "label": "Create a new package",
+      "command": "yarn tsp:dev create ${input:createPackageName} --template ${input:createTemplate}"
     },
     {
-      "label": "Add a reference from one package to another",
-      "command": "yarn tsp:dev ref --from ${input:refFrom} --to ${input:refTo}"
+      "label": "Add a dependency from one package to another",
+      "command": "yarn tsp:dev add ${input:addPackageName} --to ${input:addTo}"
     },
     {
       "label": "Remove a reference from one package to another",
-      "command": "yarn tsp:dev unref --from ${input:unrefFrom} --to ${input:unrefTo}"
+      "command": "yarn tsp:dev remove ${input:removePackageName} --from ${input:removeFrom}"
     },
     { "label": "List all packages", "command": "yarn tsp list" },
     {

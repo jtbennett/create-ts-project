@@ -53,7 +53,7 @@ const copyReferencedPackages = async (mainPkg: Package) => {
     return "";
   };
 
-  const references = mainPkg.loadReferences();
+  const references = mainPkg.loadDependencies();
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   await eachSeries(references, async (ref) => {
     log.info(`  ${ref.name}`);

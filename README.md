@@ -22,19 +22,20 @@ You now have a monorepo ready for development. Open `my-proj` in VS Code or your
 Some example `tsp` commands:
 
 ```bash
-# Add a server app:
-yarn tsp add my-server --template node-server
+# Create a library package:
+yarn tsp create my-lib --template node-lib
+
+# Create a server app (-t is the same as --template):
+yarn tsp create my-server -t node-server
 # The app is created at ./packages/my-server
+
+# Add to the server a dependency on the library:
+yarn tsp add my-lib --to my-server
 
 # Run the server in dev mode:
 yarn workspace my-server dev
 # The server is running at http://localhost:3000
 
-# Add a library package (-t is the same as --template):
-yarn tsp add my-lib -t node-lib
-
-# Add a reference from the server app to the library package:
-yarn tsp ref --from my-server --to my-lib
 ```
 
 Other useful scripts (see [Yarn scripts](#yarn-scripts) for a full list):
@@ -185,7 +186,7 @@ _For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp
 
 `tsp` -- the `ts-project-scripts` CLI -- was installed as a devDependency when you ran the create command above.
 
-`tsp` is used to add packages, which is really just copying a template into the `packages` folder. More importantly, it is used to manage references (dependencies) between packages. It updates the various config files so all the tools work as intended.
+`tsp` is used to create packages, which is really just copying a template into the `packages` folder. More importantly, it is used to manage references (dependencies) between packages. It updates the various config files so all the tools work as intended.
 
 A "package" can be a web server, a command-line tool, a standalone library -- pretty much anything written in TypeScript that has a `package.json` file and a `tsconfig.json` file.
 
@@ -193,12 +194,12 @@ A "package" can be a web server, a command-line tool, a standalone library -- pr
 
 Let's walk through the same steps as listed in the Quickstart above, but with some explanation along the way.
 
-### Add a node server
+### Create a node server
 
-Add a node server package:
+Create a node server package:
 
 ```bash
-yarn tsp add my-server --template node-server
+yarn tsp create my-server --template node-server
 ```
 
 The package is created at: `./packages/my-server`. It contains these files:
@@ -230,7 +231,7 @@ _You don't have to use express to use this template. Delete the dependency on ex
 To create another package, use the same command as above, but specify a different template. This time we'll use the shorthand `-t` instead of `--template`. Stop the server with `Ctrl-C` and run:
 
 ```bash
-yarn tsp add my-lib -t node-lib
+yarn tsp create my-lib -t node-lib
 ```
 
 Now let's consume my-lib from my-server.
@@ -242,7 +243,7 @@ This is the conceptual equivalent of adding a dependency in `package.json`. `tsp
 You first need to stop the server with `Ctrl-C`. Then, to add the reference and restart the server:
 
 ```bash
-yarn tsp ref --from my-server --to my-lib
+yarn tsp add --from my-server --to my-lib
 yarn workspace my-server dev
 ```
 
@@ -269,7 +270,7 @@ In the dev server, you will see `tsc` recompile, the server restart, and the new
 This is the conceptual equivalent of removing a dependency in `package.json`. `tsp` does that for you, as well as making corresponding changes to nodemon, TypeScript and other configs.
 
 ```bash
-yarn tsp unref --from my-server --to my-lib
+yarn tsp remove --from my-server --to my-lib
 ```
 
 You _should_ see an error in the server, because `./packages/my-server/src/index.ts` still contains an import from `my-lib`, which is no longer referenced.
@@ -445,7 +446,7 @@ If your build succeeds, the package(s) will be published to npm!
 
 All of the root-level yarn scripts are also available as VS Code tasks. When you choose Run Tasks, you will see them listed.
 
-In addition, the `tsp add`, `tsp ref` and `tsp unref` commands are also available as tasks. These will prompt you to input package names and provides a drop-down for selecting a template for `tsp add`.
+In addition, the `tsp create`, `tsp add` and `tsp remove` commands are also available as tasks. These will prompt you to input package names and provides a drop-down for selecting a template for `tsp create`.
 
 I recommend that you also create a task to run each server in your repo in dev mode. A sample is included in the `./.vscode/tasks.json` file. Uncomment it and simply replace `my-server` with the directory name of your server package.
 
