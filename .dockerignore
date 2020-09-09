@@ -1,7 +1,9 @@
+_tmp
+!_tmp/deps
+.github
 .vscode
 docs
 node_modules
-tmp
 
 **/.env
 **/lib

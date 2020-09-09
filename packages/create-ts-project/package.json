@@ -66,8 +66,5 @@
     "moduleNameMapper": {
       "@jtbennett/ts-project-cli-utils": "<rootDir>/../ts-project-cli-utils/src"
     }
-  },
-  "tspConfig": {
-    "deploy": true
   }
 }

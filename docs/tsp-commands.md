@@ -201,17 +201,13 @@ yarn tsp remove --all --to my-lib
 # All dependencies on my-lib have been removed from all packages in the project
 ```
 
-### `tsp dockerfile`
+### `tsp bundle <pkg-name> --out-dir <out-dir>`
 
 _Docs coming soon..._
 
-Meant to be run during a CI process. Modifies the Dockerfile included in the template so that all the correct files are included for a build, and also for apps that are to be deployed.
+Meant to be run during a build process, to prepare the app for deployment. It removes anything not required to run the app, including devDependencies. Everything required to run the app is copied to `--out-dir`. 
 
-### `tsp bundle <pkg-name | --all>`
-
-_Docs coming soon..._
-
-Meant to be run from within the Dockerfile during the CI process. "Bundles" an app for deployment. For apps, moves the build version of all referenced packages (workspaces in the same repo) and all their transitive dependencies that are required under the app node_modules.
+**Set `--out-dir` to a directory outside the repo, or you risk having files overwritten!**
 
 ## Package templates
 

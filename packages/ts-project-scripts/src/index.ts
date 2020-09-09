@@ -10,7 +10,6 @@ import { rename } from "./commands/rename";
 import { add } from "./commands/add";
 import { remove } from "./commands/remove";
 
-import { dockerfile } from "./commands/update-dockerfile";
 import { bundle } from "./commands/bundle";
 
 (yargs as yargs.Argv<CliOptions>)
@@ -30,8 +29,6 @@ import { bundle } from "./commands/bundle";
   .command(rename as any)
   .command(add as any)
   .command(remove as any)
-
-  .command(dockerfile as any)
   .command(bundle as any)
 
   .demandCommand(1, "You must enter a command.")
