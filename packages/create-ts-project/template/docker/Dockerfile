@@ -36,7 +36,7 @@ RUN yarn verify:all
 # ----- Bundle the app for deployment -----
 ARG APP_NAME
 RUN yarn workspaces focus --production ${APP_NAME}
-RUN packages/ts-project-scripts/lib/index.js bundle ${APP_NAME} --out-dir /tmp/bundle
+RUN yarn tsp bundle ${APP_NAME} --out-dir /tmp/bundle
 
 
 # ----------------------------------------
@@ -55,9 +55,6 @@ USER node
 # ----- Copy files required at runtime by the app -----
 COPY --from=build --chown=1000:1000 /tmp/build/node_modules /home/node/node_modules/
 COPY --from=build --chown=1000:1000 /tmp/bundle /home/node/
-
-ARG APP_VERSION
-ENV APP_VERSION ${APP_VERSION:-unknown}
 
 ARG COMMIT_HASH
 ENV COMMIT_HASH ${COMMIT_HASH:-unknown}

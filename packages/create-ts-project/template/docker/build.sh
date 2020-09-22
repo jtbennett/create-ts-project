@@ -8,12 +8,10 @@ IFS=$'\n\t'
 # DOCKER_REPO - if not present, the image will be built, but not pushed.
 # APP_NAME - *required*, name as in package.json.
 # APP_DIR - if different from APP_NAME without any @scope.
-# APP_VERSION - defaults to 'unknown'. Image will have this value as an env var.
 # COMMIT_HASH - defaults to 'unknown' Image will have this value as an env var.
 
 # Set defaults.
 
-APP_VERSION=${APP_VERSION:-unknown}
 COMMIT_HASH=${COMMIT_HASH:-unknown}
 
 if [ -z "$APP_NAME" ]; then
@@ -62,7 +60,6 @@ docker build \
   --build-arg TEMP_DEPS_DIR=${TEMP_DEPS_DIR} \
   --build-arg APP_NAME=${APP_FULL_NAME} \
   --build-arg APP_DIR=${APP_DIR} \
-  --build-arg APP_VERSION=${APP_VERSION} \
   --build-arg COMMIT_HASH=${COMMIT_HASH} \
   --file ./docker/Dockerfile \
   .
@@ -83,11 +80,10 @@ docker build \
   --cache-from ${APP_IMAGE}:latest \
   --cache-from ${BUILD_IMAGE}:latest \
   --tag ${APP_IMAGE}:latest \
-  --tag ${APP_IMAGE}:${APP_VERSION} \
+  --tag ${APP_IMAGE}:${COMMIT_HASH} \
   --build-arg TEMP_DEPS_DIR=${TEMP_DEPS_DIR} \
   --build-arg APP_NAME=${APP_FULL_NAME} \
   --build-arg APP_DIR=${APP_DIR} \
-  --build-arg APP_VERSION=${APP_VERSION} \
   --build-arg COMMIT_HASH=${COMMIT_HASH} \
   --file ./docker/Dockerfile \
   .

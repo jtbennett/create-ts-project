@@ -13,6 +13,7 @@ import {
   PackageNotFoundError,
 } from "@jtbennett/ts-project-cli-utils";
 import { getPaths } from "../paths";
+import { execSync } from "child_process";
 
 const NODE_MODULES = "node_modules";
 
@@ -55,6 +56,13 @@ const handler = tspHandler<
   if (!app) {
     throw new PackageNotFoundError(args.appName);
   }
+
+  // Remove all devDependencies, plus all dependencies not used by this app.
+  // This has to be done inside bundle, because ts-project-scripts itself is a
+  // devDependency, and will be removed by this command.
+  execSync(`yarn workspaces focus --production ${args.appName}`, {
+    stdio: "inherit",
+  });
 
   // Copy root node_modules.
   if (args.nodeModules) {

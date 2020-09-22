@@ -2,6 +2,9 @@ _tmp
 !_tmp/deps
 .github
 .vscode
+.yarn
+!.yarn/plugins
+!.yarn/releases
 docs
 node_modules
 

@@ -53,7 +53,6 @@ jobs:
         env:
           # Comment out the following line to skip pushing the image to your GitHub repo.
           DOCKER_REPO: docker.pkg.github.com/${{ github.owner }}/${{ github.repo }}
-          APP_VERSION: ${{ github.ref }}'#refs/tags/v}}
           COMMIT_HASH: $(git rev-parse --short=7 ${{ github.sha }})
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
@@ -73,6 +72,7 @@ jobs:
       #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       #   run: |
       #     echo "${{ secrets.HEROKU_API_KEY }}" | docker login registry.heroku.com -u _ --password-stdin
+      #     docker tag ${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:latest registry.heroku.com/${{ env.CI_HEROKU_APP_NAME }}/web:latest
       #     docker push registry.heroku.com/${{ env.CI_HEROKU_APP_NAME }}/web:latest
       #     heroku container:release web --app ${{ env.CI_HEROKU_APP_NAME }}
           
