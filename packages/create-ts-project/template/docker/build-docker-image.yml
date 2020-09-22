@@ -5,15 +5,11 @@
 # 2. Change APP_NAME variable below to the name of the app.
 #
 # The image will be built on each push to or pull request on main.
-#
-# To deploy the image 
+# It will be pushed to the current GitHub repo's Packages.
 
 name: Build docker image
 
 on:
-  create:
-    tag:
-      - "v*"
   push:
     branches:
       - main
@@ -27,8 +23,14 @@ defaults:
     shell: bash
 
 env:
+  # These variables are used by build.sh.
+
   # Value should be the name from package.json of the app.
   APP_NAME: "@foo/bar"
+
+  # Comment out the following line to skip pushing the image to your GitHub repo.
+  DOCKER_REPO: docker.pkg.github.com/${{ github.owner }}/${{ github.repo }}
+  COMMIT_HASH: $(git rev-parse --short=7 ${{ github.sha }})
 
 jobs:
   build:
@@ -50,15 +52,10 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build and push docker image to GitHub repo
-        env:
-          # Comment out the following line to skip pushing the image to your GitHub repo.
-          DOCKER_REPO: docker.pkg.github.com/${{ github.owner }}/${{ github.repo }}
-          COMMIT_HASH: $(git rev-parse --short=7 ${{ github.sha }})
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
           chmod +x ./docker/build.sh
           ./docker/build.sh
-
       # -------------------------------------------------------------------------
       # EXAMPLE: DEPLOYING THE DOCKER IMAGE TO HEROKU
       # -------------------------------------------------------------------------
@@ -72,7 +69,6 @@ jobs:
       #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       #   run: |
       #     echo "${{ secrets.HEROKU_API_KEY }}" | docker login registry.heroku.com -u _ --password-stdin
-      #     docker tag ${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:latest registry.heroku.com/${{ env.CI_HEROKU_APP_NAME }}/web:latest
+      #     docker tag ${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ env.COMMIT_HASH }} registry.heroku.com/${{ env.CI_HEROKU_APP_NAME }}/web:latest
       #     docker push registry.heroku.com/${{ env.CI_HEROKU_APP_NAME }}/web:latest
       #     heroku container:release web --app ${{ env.CI_HEROKU_APP_NAME }}
-          
