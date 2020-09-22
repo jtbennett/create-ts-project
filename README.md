@@ -1,8 +1,10 @@
 # Create TypeScript Project ![Build](https://github.com/jtbennett/create-ts-project/workflows/Build/badge.svg?branch=main)
 
-Create TypeScript monorepo projects with [project references](https://www.typescriptlang.org/docs/handbook/project-references.html), [jest](https://jestjs.io/), [eslint](https://eslint.org/) and [prettier](https://prettier.io/); an automated lint/test/build on every push to GitHub; and an (optional) automated publish to npm on every push of a version tag to GitHub.
+Create TypeScript Project generates a ready-for-dev monorepo for projects using [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html), [yarn](https://yarnpkg.com) (v2), [jest](https://jestjs.io/), [eslint](https://eslint.org/) and [prettier](https://prettier.io/).
 
-**The short version: It's like Create React App for TypeScript monorepos, with scripts for CI and package publishing thrown in.**
+The generated repo includes scripts to help manage dependencies between packages in the repo. And it includes GitHub Actions for lint/test/build on every push or PR, publishing modules to NPM, and packaging NodeJS apps in Docker images.
+
+**The short version: It's like Create React App for TypeScript monorepos, with (optional) continuous integration, package publishing, and Docker-based deployment also ready-to-use.**
 
 If you have questions or something doesn't "just work", feel free to [submit an issue](https://github.com/jtbennett/create-ts-project/issues/new). You can find me on Twitter [@jtbennett](https://twitter.com/jtbennett).
 
@@ -14,7 +16,7 @@ In this file:
 
 - [Why?](#why)
 
-- [Getting started](#getting-started)
+- [Walk-through](#walk-through)
 
 - [Philosophy](#philosophy)
 
@@ -38,11 +40,11 @@ Additional documentation:
 
 ## Quickstart
 
-- Install [node >=12.0](https://nodejs.org). (_node 10.x and 11.x will work, but require a couple of tweaks._)
+- Install [node](https://nodejs.org) (version >=12.0).
 
-- Install [yarn >=1.12, <2.0](https://classic.yarnpkg.com) globally (`npm install -g yarn`).
+- Install [yarn](https://yarnpkg.com/getting-started/install) globally (version >=1.22).
 
-To create a new project, open a terminal and run:
+Open a terminal and run:
 
 ```bash
 yarn create @jtbennett/ts-project my-proj
@@ -50,30 +52,18 @@ yarn create @jtbennett/ts-project my-proj
 cd my-proj
 ```
 
-You now have a TypeScript monorepo ready for development, with TypeScript project references and yarn v2 workspaces.
+Open `my-proj` in VS Code or your editor of choice. All the files you see are configured so that yarn, TypeScript, Jest, ESLint and Prettier will work correctly. You can leave them all as-is. Your code will go in the `./packages` directory.
 
-Open `my-proj` in VS Code or your editor of choice. All the files you see are configured so that yarn, TypeScript, Jest, ESLint and Prettier will work correctly. You can leave them all as-is.
+### `tsp` commands
 
-Your code will go in the `./packages` directory.
-
-### About `tsp`
-
-A command line tool called `tsp` is included as a `devDependency` in the root `package.json` file. Use `tsp` to create new packages and to add/remove dependencies between packages in the project. (This is similar to how `react-scripts` is a `devDependency` when you run `create-react-app`.)
-
-You don't have to use `tsp`, but it makes things easier. When you add/remove dependencies between packages in the project, it will update `package.json` and `tsconfig` files so that everything continues to work correctly.
-
-For a simple walk-through with more explanation, see [Using `tsp`](#using-tsp) below.
-
-For detailed information on all `tsp` commands, see [`tsp` commands](./docs/tsp-commands.md)
-
-Example commands to create two packages and a dependency between them.
+A command line tool called `tsp` is included as a `devDependency` in the root `package.json` file. Use it to create new packages and to add/remove dependencies between packages in the project. It will update various config files, so everything just works.
 
 ```bash
-# Create the packages in ./packages:
+# Create new packages in ./packages:
 yarn tsp create my-lib --template node-lib
 yarn tsp create my-server -t node-server
 
-# Add the dependency:
+# Add a dependency:
 cd ./packages/my-server
 yarn tsp add my-lib
 
@@ -82,23 +72,31 @@ yarn dev
 # The server is running at http://localhost:3000
 ```
 
-You can now import modules form `my-lib` into `my-server`:
+You can now import modules from `my-lib` into `my-server`:
 
 ```typescript
+// ./my-server/src/index.ts
 import foo from "my-lib";
 console.log(foo);
 ```
 
-### Other useful yarn scripts
+More info:
 
-The root `package.json` file includes other scripts you can use. (See [Yarn scripts](#yarn-scripts) for more details.)
+- [Using `tsp`](#using-tsp) - a walk-through with more explanation.
+- [`tsp` commands](./docs/tsp-commands.md) - reference for all `tsp` commands.
+- [Package templates](./docs/package-templates.md) - List of templates that can be used with `tsp create`.
+
+### yarn scripts
+
+The root `package.json` file includes additional scripts. (See [Yarn scripts](#yarn-scripts) for details.) Some examples:
 
 ```bash
 # Scripts that operate on all packages in the project:
 yarn lint:all
 yarn test:all
 yarn build:all
-yarn clean:all
+yarn clean:all # deletes build output
+yarn purge:all # also deletes all node_modules directories
 
 # Lint, test, clean and build all packages - useful before committing to git!
 yarn verify:all
@@ -114,8 +112,20 @@ yarn workspace my-react-app dev
 
 # Set your working directory to a specific package to shorten the commands:
 cd ./packages/my-server
+yarn lint
+yarn test
 yarn dev
 ```
+
+### GitHub Action workflows
+
+- **CI build validation.** The repo includes a workflow at `./.github/workflows/build.yml`. It is pre-configured to lint, test and build your packages on each push or PR on the `main` branch.
+
+  - **Publish to NPM.** That workflow contains a commented-out step for publishing packages to NPM each time you push a tag like `v1.2.3` to GitHub. See [Publishing to NPM](./docs/publishing-to-npm.md) for instructions to enable publishing.
+
+- **Build Docker image.** The `./docker` directory contains a workflow to build a ready-to-deploy docker image containing a node application on each push or PR to the `main` branch.
+
+  - **Deploy image to Heroku.** That workflow contains a commented-out step showing how to deploy an app to Heroku.
 
 ## Why?
 
@@ -129,7 +139,7 @@ As a result, these projects are usually monorepos -- multiple packages/apps in t
 
 **_...plus a lot of interdependent tools..._**
 
-A typical project involves configuring TypeScript, jest, eslint, prettier, nodemon, Docker, VS Code, a CI process (e.g., GitHub Actions, CircleCI, TravisCI, Jenkins), deployments to Heroku or AWS or Azure or Google Cloud, and sometimes publishing to npm.
+A typical project requires configuring TypeScript, jest, eslint, prettier, nodemon, yarn, node, Docker, VS Code, a CI process (e.g., GitHub Actions, CircleCI, TravisCI, Jenkins), deployments to Heroku or AWS or Azure or Google Cloud, and sometimes publishing to npm.
 
 **_...involves a lot of configuration effort..._**
 
@@ -137,31 +147,23 @@ Separately, each of those tools is straightforward to use.
 
 Getting them all working together in harmony takes effort. For example, we want Jest to be able to find and run our tests, but we don't want test-related files in our build output that will be deployed or published.
 
-Doing that in a monorepo is more effort. TypeScript, yarn and jest all use different approaches to resolving packages within the repo.
+Doing that in a monorepo is more effort. TypeScript, yarn, jest, eslint, and node may all use different approaches to resolving packages within the repo.
 
 And keeping them working consistently for all members of a team -- even more effort. For example, does that one person whose linter is using different rules keep breaking the build? Or do semicolons and whitespace make your diffs more difficult to read?
 
 **_...and ongoing hassle..._**
 
-Adding a dependency between two packages in a monorepo sounds simple: run the yarn or npm or lerna command and you're done.
+Adding a dependency between two packages in a monorepo sounds simple: run the yarn or npm or lerna command and you're done. But are you? Does your dev server restart when a file in one of its dependencies changes? Does your editor correctly highlight TypeScript and eslint errors, offer code completion and navigate across packages?
 
-But are you?
+Workspaces are great, but they're really built to help with publishing packages to NPM. When you are deploying an app, how will node resolve your workspaces? Are you shipping all your source code and tests or unnecessary dependencies, because of how workspaces use symlinks?
 
-- Does your dev server restart when a file in one of its dependencies changes?
-
-- Does your editor know how to resolve TypeScript types so it can highlight errors, offer code completion and navigate source code across packages with "Go to definition (F12)"?
-
-- Do the eslint rules that check TypeScript types work across dependencies?
-
-- Can Jest resolve the dependencies when you run tests?
-
-- When built for deployment, can the transpiled .js files be resolved by node?
+CI tools make automated builds fairly easy. But are you taking advantage of caching to speed up your builds? Including Docker layer caching? Are your Docker images bloated from files you needed to build, but don't need at runtime?
 
 **_...which keeps you from focusing on the actual product._**
 
-I'd like everyone on the team to have all that "just work", so we can focus on the actual thing we're trying to build. That's the goal for Create Typescript Project.
+I'd like everyone on the team to have all that "just work" as soon as they clone a new repo, so we can focus on the actual thing we're trying to build. That's the goal for Create Typescript Project.
 
-## Getting started
+## Walk-through
 
 ### Create a project
 
@@ -169,9 +171,9 @@ _It is not recommended to install the `create-ts-project` package. Instead, use 
 
 Prerequisites:
 
-- Install [node >=12.0](https://nodejs.org). (_node 10.x and 11.x will work, but require a couple of tweaks._)
+- Install [node](https://nodejs.org) (version >=12.0).
 
-- Install [yarn >=1.12, <2.0](https://classic.yarnpkg.com) globally (`npm install -g yarn`).
+- Install [yarn](https://yarnpkg.com/getting-started/install) globally (version >=1.22).
 
 To create a new project, open a terminal and run:
 
@@ -180,7 +182,7 @@ yarn create @jtbennett/ts-project my-proj
 # or: npx @jtbennett/create-ts-project my-proj
 ```
 
-Running that command will create a directory called `my-proj` inside the current folder. Inside that directory, it will generate the initial project structure and install all the tools and other devDependencies.
+That will create a directory called `my-proj` inside the current folder. Inside that directory, it will generate the initial project structure and install all the tools and other devDependencies.
 
 **Project structure**
 
@@ -365,8 +367,8 @@ For development:
 For continuous integration (CI):
 
 - GitHub Actions - running continuous integration (CI) lint, test and build. Optionally publishing to npm.
-- GitHub packages - hosting docker images _Coming soon!_
-- Docker - output of build process for applications is a Docker image. _Coming soon!_
+- GitHub packages - hosting docker images.
+- Docker - output of build process for applications is a Docker image.
 
 The more of those tools that you use, the more useful CTSP may be, but most can be removed or replaced if you want to go through the effort of configuring an alternative. That said, it probably makes little sense to use this template if you aren't primarily using TypeScript.
 
