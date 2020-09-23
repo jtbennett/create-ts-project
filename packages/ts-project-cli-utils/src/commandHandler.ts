@@ -3,7 +3,7 @@ import { log, logAndExit } from "./log";
 import { Arguments } from "yargs";
 
 export const commandHandler = <TArgs extends CliOptions>(
-  commandFunc: (args: Arguments<TArgs>) => any,
+  commandFunc: (args: Arguments<TArgs>) => unknown,
 ) => (args: Arguments<TArgs>) => {
   if (args.verbose) {
     log.verbose(`cwd: ${process.cwd()}`);

@@ -76,7 +76,7 @@ const handler = tspHandler<
   await copyWorkspaceFiles(app, join(args.outDir, app.dir));
 
   // Copy files from workspaces the app depends on.
-  const workspacesToCopy: Map<string, Package> = new Map();
+  const workspacesToCopy = new Map<string, Package>();
   const addWorkspacesToCopy = (pkg: Package) => {
     if (!workspacesToCopy.has(pkg.name)) {
       pkg.loadDependencies().forEach((dep) => {

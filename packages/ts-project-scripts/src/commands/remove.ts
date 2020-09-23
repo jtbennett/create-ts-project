@@ -41,7 +41,7 @@ const handler = tspHandler<
   }
 
   if (fromPackages.length === 0) {
-    log.warn(`No packages found with a reference to "${args.to}"`);
+    log.warn(`No packages found with a reference to "${args.pkgName}"`);
     // Don't bother running yarn, since we made no changes.
     args.yarn = false;
   } else {

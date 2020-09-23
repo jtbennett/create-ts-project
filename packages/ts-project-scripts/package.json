@@ -37,7 +37,7 @@
     "test": "jest --passWithNoTests --rootDir ./",
     "clean": "rimraf ./lib ./tsconfig.tsBuildInfo",
     "build": "tsc --build ./tsconfig.build.json && chmod +x ./lib/index.js",
-    "verify": "yarn lint --max-warnings 0 && yarn test && yarn clean && yarn build",
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
     "purge": "yarn clean && rimraf ./coverage ./node_modules",
     "tsp": "yarn run tsp:dev \"$@\" --cwd $(pwd)"
   },
@@ -58,11 +58,11 @@
     "@types/resolve": "0.0.7",
     "@types/semver": "5.5.0",
     "@types/yargs": "^15.0.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.9.0",
     "jest": "26.3.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.2.0",
-    "typescript": "~4.0.2"
+    "typescript": "~4.0.3"
   },
   "jest": {
     "preset": "ts-jest",

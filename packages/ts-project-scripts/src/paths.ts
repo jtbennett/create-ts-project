@@ -5,8 +5,8 @@ import { CliError, getFiles, Files } from "@jtbennett/ts-project-cli-utils";
 
 export class Paths {
   files: Files;
-  private _rootPath: string = undefined as any;
-  private _packagesPath: string = undefined as any;
+  private _rootPath!: string;
+  private _packagesPath!: string;
 
   constructor() {
     this.files = getFiles();

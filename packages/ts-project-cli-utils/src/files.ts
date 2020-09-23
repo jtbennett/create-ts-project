@@ -88,7 +88,7 @@ export class Files {
     return JSON.parse(contents) as T;
   }
 
-  writeJsonSync(path: string, json: {}) {
+  writeJsonSync(path: string, json: any) {
     // TODO: Use jsonc-parser for tsconfig, so we preserve comments.
     this.writeFileSync(path, JSON.stringify(json, null, 2));
   }

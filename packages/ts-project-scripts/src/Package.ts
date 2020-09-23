@@ -76,7 +76,7 @@ export class Package {
     });
 
     const packageFilePath = join(path, PACKAGE_JSON);
-    const packageJson = files.readJsonSync(packageFilePath);
+    const packageJson = files.readJsonSync<PackageJson>(packageFilePath);
     packageJson.name = args.name;
     files.writeJsonSync(packageFilePath, packageJson);
 

@@ -32,6 +32,9 @@ module.exports = {
     // Be explicit when you must, but return type is usually inferred correctly.
     "@typescript-eslint/explicit-function-return-type": "off",
 
+    // Function return types can be inferred, so this is too onerous.
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+
     // Avoid using "any" or "as any" wherever possible, but this is too onerous.
     "@typescript-eslint/no-explicit-any": "off",
 

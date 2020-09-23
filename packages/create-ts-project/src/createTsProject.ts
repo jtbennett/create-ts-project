@@ -22,7 +22,7 @@ const checkYarnVersion = () => {
   const maxYarn = "3.0.0";
   let hasMinYarn = false;
   let hasMaxYarn = false;
-  let version = null;
+  let version! : string;
   try {
     version = execSync("yarnpkg --version").toString().trim();
     if (semver.valid(version)) {
