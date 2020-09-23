@@ -38,16 +38,14 @@ jobs:
       - name: Install dependencies
         run: yarn --immutable
 
-      - name: Lint
-        run: yarn lint:all
-
       - name: Test
         run: yarn test:all
-
+      
       - name: Build
-        run: |
-          yarn clean:all
-          yarn build:all
+        run: yarn build:all
+        
+      - name: Lint
+        run: yarn lint:all
 
       - name: Publish
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
