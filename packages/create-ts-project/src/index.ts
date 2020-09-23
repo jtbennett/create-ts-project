@@ -11,9 +11,11 @@ import {
 
 import { createTsProject } from "./createTsProject";
 
-const handler = commandHandler(createTsProject);
+type CreateOptions = CliOptions & { projectName: string; yarn: boolean };
 
-(yargs as yargs.Argv<CliOptions & { projectName: string }>)
+const handler = commandHandler<CreateOptions>(createTsProject);
+
+(yargs as yargs.Argv<CreateOptions>)
   .usage("Usage: $0 <project-name> [--no-yarn]")
 
   .middleware((argv) => {

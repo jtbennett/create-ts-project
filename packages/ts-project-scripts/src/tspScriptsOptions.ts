@@ -7,9 +7,9 @@ export interface TspScriptsOptions extends CliOptions {
 }
 
 export const tspScriptsOptions: { [key: string]: Options } = {
-  "yarn": {
+  yarn: {
     boolean: true,
     describe: "Run yarn after the command completes. Disable with --no-yarn.",
-    default: true
-  }
+    default: true,
+  },
 };

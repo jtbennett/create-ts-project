@@ -32,15 +32,15 @@
     "tsp": "yarn run tsp:dev \"$@\" --cwd $(pwd)"
   },
   "dependencies": {
-    "chalk": "^4.0.0",
-    "fs-extra": "^9.0.0",
-    "yargs": "^15.3.1"
+    "chalk": "^4.1.0",
+    "fs-extra": "^9.0.1",
+    "yargs": "^16.0.3"
   },
   "devDependencies": {
     "eslint": "^7.9.0",
-    "jest": "26.3.0",
+    "jest": "26.4.2",
     "rimraf": "^3.0.2",
-    "ts-jest": "^26.2.0",
+    "ts-jest": "^26.4.0",
     "typescript": "~4.0.3"
   },
   "jest": {

@@ -22,7 +22,7 @@ const checkYarnVersion = () => {
   const maxYarn = "3.0.0";
   let hasMinYarn = false;
   let hasMaxYarn = false;
-  let version! : string;
+  let version!: string;
   try {
     version = execSync("yarnpkg --version").toString().trim();
     if (semver.valid(version)) {
@@ -165,7 +165,7 @@ const updateRootPackageJson = (projectPath: string, projectName: string) => {
   const projectPackageJson = files.readJsonSync<PackageJson>(
     join(projectPath, "package.json"),
   );
-  projectPackageJson.name = projectName;
+  projectPackageJson.name = basename(projectName);
   projectPackageJson.devDependencies[
     "@jtbennett/ts-project-scripts"
   ] = `^${latestScriptsVersion}`;

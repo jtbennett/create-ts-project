@@ -1,6 +1,6 @@
 import { Argv } from "yargs";
 import { copySync, existsSync } from "fs-extra";
-import { join } from "path";
+import { join, normalize, sep } from "path";
 import { eachSeries } from "async";
 import packlist = require("npm-packlist");
 
@@ -8,6 +8,7 @@ import { Package } from "../Package";
 import { TspScriptsOptions, tspScriptsOptions } from "../tspScriptsOptions";
 import { tspHandler } from "../tspHandler";
 import {
+  CliError,
   cliOptions,
   log,
   PackageNotFoundError,
@@ -17,10 +18,20 @@ import { execSync } from "child_process";
 
 const NODE_MODULES = "node_modules";
 
-const copyDirectoryIfExists = (src: string, dest: string) => {
+const copyNodeModules = (src: string, dest: string, skip?: Package[]) => {
   if (existsSync(src)) {
     log.verbose(`  Copying ${src} to ${dest}`);
-    copySync(src, join(dest), { overwrite: false, errorOnExist: true });
+
+    // Don't copy workspaces -- they're handled separately.
+    const filter =
+      skip && skip?.length > 0
+        ? (src: string) =>
+            !skip.some((pkg) =>
+              src.endsWith(join(NODE_MODULES, normalize(pkg.name))),
+            )
+        : undefined;
+
+    copySync(src, dest, { overwrite: false, errorOnExist: true, filter });
   } else {
     log.verbose(`  Directory to copy does not exist: "${src}"`);
   }
@@ -38,18 +49,14 @@ const copyWorkspaceFiles = async (workspace: Package, dest: string) => {
 
   // Copy node_modules, which will contain only the dependencies for which
   // this workspace requires a different version than another workspace.
-  copyDirectoryIfExists(
-    join(workspace.path, NODE_MODULES),
-    join(dest, NODE_MODULES),
-  );
+  copyNodeModules(join(workspace.path, NODE_MODULES), join(dest, NODE_MODULES));
 };
 
 const handler = tspHandler<
-  TspScriptsOptions & { appName: string; outDir: string; nodeModules: boolean }
+  TspScriptsOptions & { appName: string; outDir: string }
 >(async (args) => {
-  args.yarn = false;
-
-  const app = Package.loadAll().find(
+  const allPackages = Package.loadAll();
+  const app = allPackages.find(
     (pkg) => pkg.packageJson && pkg.packageJson.name === args.appName,
   );
 
@@ -57,20 +64,33 @@ const handler = tspHandler<
     throw new PackageNotFoundError(args.appName);
   }
 
+  if (existsSync(args.outDir)) {
+    throw new CliError(`Out directory already exists: ${args.outDir}`);
+  }
+
   // Remove all devDependencies, plus all dependencies not used by this app.
   // This has to be done inside bundle, because ts-project-scripts itself is a
   // devDependency, and will be removed by this command.
-  execSync(`yarn workspaces focus --production ${args.appName}`, {
-    stdio: "inherit",
-  });
-
-  // Copy root node_modules.
-  if (args.nodeModules) {
-    copyDirectoryIfExists(
-      join(getPaths().rootPath, NODE_MODULES),
-      join(args.outDir, NODE_MODULES),
+  if (args.yarn) {
+    log.info(
+      `Removing dependencies not used by ${args.appName} and all devDependencies.`,
+    );
+    execSync(`yarn workspaces focus --production ${args.appName}`, {
+      stdio: "inherit",
+    });
+  } else {
+    log.warn(
+      "Yarn was not run. node_modules in --out-dir may be missing required dependencies and/or " +
+        "include devDependencies or other unnecessary dependencies.",
     );
   }
+
+  // Copy root node_modules, excluding workspace symlinks.
+  copyNodeModules(
+    join(getPaths().rootPath, NODE_MODULES),
+    join(args.outDir, NODE_MODULES),
+    allPackages,
+  );
 
   // Copy the app's files.
   await copyWorkspaceFiles(app, join(args.outDir, app.dir));
@@ -90,14 +110,14 @@ const handler = tspHandler<
   await eachSeries(workspacesToCopy.values(), async (workspace) => {
     await copyWorkspaceFiles(
       workspace,
-      join(args.outDir, NODE_MODULES, workspace.dir),
+      join(args.outDir, NODE_MODULES, normalize(workspace.name)),
     );
   });
 });
 
 export const bundle = {
   command: "bundle <app-name>",
-  describe: "Prepare an app for deployment. ",
+  describe: "Prepare an app for deployment",
 
   builder: (yargs: Argv) =>
     yargs
@@ -111,10 +131,6 @@ export const bundle = {
           alias: "o",
           describe: "Path where the bundled application will be output.",
           demand: true,
-        },
-        nodeModules: {
-          alias: "n",
-          describe: "Copy the root node_modules to --out-dir.",
         },
         ...cliOptions,
         ...tspScriptsOptions,
