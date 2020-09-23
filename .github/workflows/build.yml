@@ -11,10 +11,8 @@ on:
     branches:
       - main
 
-defaults:
-  runs-on: ubuntu-18.04
-
 jobs:
+  runs-on: ubuntu-18.04
   build:
     steps:
       - name: Checkout
