@@ -1,6 +1,6 @@
 import { Argv } from "yargs";
 import { copySync, existsSync } from "fs-extra";
-import { join, normalize, sep } from "path";
+import { join, normalize } from "path";
 import { eachSeries } from "async";
 import packlist = require("npm-packlist");
 
