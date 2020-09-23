@@ -13,8 +13,6 @@ on:
 
 defaults:
   runs-on: ubuntu-18.04
-  run:
-    shell: bash
 
 jobs:
   build:
