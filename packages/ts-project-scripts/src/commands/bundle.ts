@@ -113,6 +113,9 @@ const handler = tspHandler<
       join(args.outDir, NODE_MODULES, normalize(workspace.name)),
     );
   });
+
+  // Don't rerun yarn on CI server.
+  args.yarn = args.yarn && process.env.CI !== "true";
 });
 
 export const bundle = {
