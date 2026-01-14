@@ -1,5 +1,7 @@
 # Create TypeScript Project ![Build](https://github.com/jtbennett/create-ts-project/workflows/Build/badge.svg?branch=main)
 
+> OBSOLETE. This repo is very old, very out of date, and has been archived. If you would like to see the much cleaner, much faster, much better way I do this now, please send me a message: [@jtbennett.com](https://bsky.app/profile/jtbennett.com) (Bluesky).
+
 Create TypeScript Project generates a ready-for-dev monorepo for projects using [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html), [yarn](https://yarnpkg.com) (v2), [jest](https://jestjs.io/), [eslint](https://eslint.org/) and [prettier](https://prettier.io/).
 
 The generated repo includes scripts to help manage dependencies between packages in the repo. And it includes GitHub Actions for lint/test/build on every push or PR, publishing modules to NPM, and packaging NodeJS apps in Docker images.
